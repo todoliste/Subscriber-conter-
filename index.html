@@ -1,603 +1,149 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Calc - Discrete Notes</title>
+<meta charset="UTF-8">
+<title>Calculatrice</title>
 <style>
-  :root{
-    --bg:#0f1114; --panel:#0b0c0e; --accent:#1db954; --muted:#9aa0a6;
-    --card:#0d0e10; --glass: rgba(255,255,255,0.03);
-  }
-  *{box-sizing:border-box}
-  body{margin:0;font-family:Inter,Arial,sans-serif;background:linear-gradient(180deg,#050506, #0f1114);color:#e6eef3}
-  header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:transparent}
-  #title{user-select:none;cursor:pointer;font-weight:700}
-  .top-controls{display:flex;gap:8px;align-items:center}
-  button, .btn{background:var(--card);border:1px solid rgba(255,255,255,0.03);padding:8px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
-  button:hover, .btn:hover{opacity:0.95}
-  main{display:grid;grid-template-columns:320px 1fr 360px;gap:12px;padding:12px}
-  /* left column (calc + camo) */
-  .left{display:flex;flex-direction:column;gap:12px}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-  /* calculator */
-  .screen{height:80px;background:#000;color:#9cff9c;font-size:34px;border-radius:10px;padding:10px;display:flex;align-items:center;justify-content:flex-end}
-  .pad{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
-  .pad button{padding:18px;font-size:18px;border-radius:8px;background:transparent;color:#e6eef3}
-  .pad button.op{background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01))}
-  /* center (secret) */
-  .center{display:flex;flex-direction:column;gap:12px}
-  .tabs{display:flex;gap:8px;flex-wrap:wrap}
-  .tab{padding:8px 12px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer;color:var(--muted)}
-  .tab.active{background:var(--accent);color:#041006}
-  .editor-toolbar{display:flex;gap:8px;margin-bottom:8px}
-  .editor{min-height:240px;padding:12px;border-radius:10px;background:var(--glass);outline:none;overflow:auto}
-  .files{display:flex;gap:8px;overflow:auto;padding:8px 0}
-  .file{padding:6px 8px;border-radius:8px;background:transparent;border:1px solid rgba(255,255,255,0.02);cursor:pointer;color:var(--muted)}
-  .file.active{background:#111217;color:#fff}
-  .search{display:flex;gap:8px;align-items:center}
-  input[type="search"], input[type="text"], input[type="password"]{
-    background:transparent;border:1px solid rgba(255,255,255,0.03);padding:8px;border-radius:8px;color:var(--muted);width:100%
-  }
-  /* right column (dict + settings) */
-  .right{display:flex;flex-direction:column;gap:12px}
-  textarea{width:100%;min-height:120px;background:transparent;border:1px solid rgba(255,255,255,0.03);color:var(--muted);padding:10px;border-radius:8px}
-  .small{font-size:13px;color:var(--muted)}
-  footer{padding:10px;text-align:center;color:var(--muted);font-size:12px}
-  /* camo weather */
-  .weather{display:flex;flex-direction:column;gap:6px;align-items:center;text-align:center}
-  .weather h3{margin:8px 0}
-  /* responsive */
-  @media (max-width:1000px){main{grid-template-columns:1fr;}}
+body {
+    background:#111; color:white; font-family:Arial;
+    display:flex; justify-content:center; align-items:center;
+    height:100vh; margin:0;
+}
+#calc, #secret {
+    width:320px; padding:20px; border-radius:15px;
+    background:#222; box-shadow:0 0 20px #000;
+}
+#screen {
+    width:100%; height:60px; font-size:28px;
+    text-align:right; padding:10px; border:none;
+    background:#000; color:#0f0; border-radius:10px;
+    margin-bottom:15px;
+}
+button {
+    width:70px; height:70px; margin:5px;
+    font-size:24px; border:none; border-radius:10px;
+    background:#333; color:white; cursor:pointer;
+}
+#secret { display:none; }
+.tabs { display:flex; margin-bottom:10px; }
+.tab { flex:1; padding:8px; text-align:center; cursor:pointer; background:#333; border-radius:10px; margin-right:5px; }
+.tab.active { background:#0f0; color:#000; }
+textarea { width:100%; height:200px; background:#000; color:#0f0; padding:10px; font-size:16px; border-radius:10px; border:none; margin-bottom:10px; }
+#dictionary { display:none; background:#111; padding:10px; border-radius:10px; height:200px; overflow:auto; }
 </style>
 </head>
 <body>
 
-<header>
-  <div id="title">Calc</div>
-  <div class="top-controls">
-    <div class="small" id="modeLabel">Mode : Calculatrice</div>
-    <button id="toggleCamo" title="Basculer camo">Activer camo</button>
-    <button id="lockBtn" title="Verrouiller mode secret">🔒 Lock</button>
-  </div>
-</header>
-
-<main>
-  <!-- LEFT: Calculatrice + camo preview -->
-  <div class="left">
-    <div class="card" id="calcCard">
-      <div class="screen" id="screen">0</div>
-      <div class="pad">
+<!-- CALCULATRICE -->
+<div id="calc">
+    <input type="text" id="screen" disabled>
+    <div>
         <button onclick="press('7')">7</button>
         <button onclick="press('8')">8</button>
         <button onclick="press('9')">9</button>
-        <button class="op" onclick="press('/')">÷</button>
-
+        <button onclick="press('/')">/</button>
+    </div>
+    <div>
         <button onclick="press('4')">4</button>
         <button onclick="press('5')">5</button>
         <button onclick="press('6')">6</button>
-        <button class="op" onclick="press('*')">×</button>
-
+        <button onclick="press('*')">*</button>
+    </div>
+    <div>
         <button onclick="press('1')">1</button>
         <button onclick="press('2')">2</button>
         <button onclick="press('3')">3</button>
-        <button class="op" onclick="press('-')">-</button>
-
+        <button onclick="press('-')">-</button>
+    </div>
+    <div>
         <button onclick="press('0')">0</button>
         <button onclick="press('.')">.</button>
-        <button onclick="calc()" class="op">=</button>
-        <button onclick="press('+')" class="op">+</button>
+        <button onclick="equal()">=</button>
+        <button onclick="press('+')">+</button>
+    </div>
+    <div>
+        <button style="width:150px" onclick="clearCalc()">C</button>
+    </div>
+</div>
 
-        <button onclick="back()" class="op">←</button>
-        <button onclick="clearAll()" class="op">C</button>
-        <button onclick="saveQuickNote()" title="Ajouter note rapide">+Note</button>
-        <button onclick="openSecret()" class="op">Secret</button>
-      </div>
+<!-- MODE SECRET -->
+<div id="secret">
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('Maths')">Maths</div>
+        <div class="tab" onclick="showTab('Francais')">Français</div>
+        <div class="tab" onclick="showTab('Histoire')">Histoire-Géo</div>
+        <div class="tab" onclick="showTab('SVT')">SVT</div>
+        <div class="tab" onclick="showTab('Physique')">Physique-Chimie</div>
+        <div class="tab" onclick="showTab('Anglais')">Anglais</div>
+        <div class="tab" onclick="showTab('Techno')">Technologie</div>
+        <div class="tab" onclick="showTab('EMC')">EMC</div>
     </div>
 
-    <!-- camo preview -->
-    <div class="card" id="camoCard" style="display:none">
-      <div class="weather">
-        <h3 id="city">Paris</h3>
-        <div id="temp" style="font-size:34px">21°C</div>
-        <div id="cond">Temps ensoleillé • Vent 6 km/h</div>
-        <div class="small">App météo factice — sert de camouflage</div>
-      </div>
+    <textarea id="notes"></textarea>
+    <button onclick="saveNotes()" style="width:100%;margin-bottom:10px;">Sauvegarder</button>
+    <button onclick="toggleDictionary()" style="width:100%;margin-bottom:10px;">Dictionnaire</button>
+    <button onclick="closeSecret()" style="width:100%;">Fermer</button>
+
+    <div id="dictionary">
+        <h3>Dictionnaire</h3>
+        <p><b>Exemple:</b> Théorème de Pythagore → a²+b²=c²</p>
+        <p>Photosynthèse → Processus par lequel les plantes produisent leur nourriture</p>
+        <p>Électricité → Circulation des électrons dans un conducteur</p>
+        <p>Exercice → Petit problème ou activité pour s’entraîner</p>
+        <p>Etc…</p>
     </div>
-
-    <!-- quick notes list -->
-    <div class="card small">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>Notes rapides</div>
-        <button onclick="newQuickNote()">+New</button>
-      </div>
-      <div id="quickList" style="margin-top:8px"></div>
-    </div>
-  </div>
-
-  <!-- CENTER: secret area -->
-  <div class="center card" id="secretArea" style="display:none">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div style="display:flex;gap:12px;align-items:center">
-        <div class="small">Mode secret</div>
-        <div id="currentTab" class="small">Math</div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <div class="search" style="width:260px">
-          <input type="search" id="globalSearch" placeholder="Recherche dans notes..." />
-        </div>
-        <button onclick="lockSecret()">Exit & Lock</button>
-      </div>
-    </div>
-
-    <div class="tabs" id="tabsBar">
-      <!-- tabs injected -->
-    </div>
-
-    <div style="display:flex;gap:12px">
-      <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="files" id="filesBar"></div>
-          <div style="display:flex;gap:8px">
-            <button onclick="newFile()">+Fichier</button>
-            <button onclick="deleteFile()" title="Supprimer fichier">Suppr</button>
-            <input type="text" id="fileName" placeholder="Nom fichier" style="min-width:120px" />
-          </div>
-        </div>
-
-        <div class="editor-toolbar" style="margin-top:8px">
-          <button onclick="fmt('bold')"><b>B</b></button>
-          <button onclick="fmt('italic')"><i>I</i></button>
-          <button onclick="fmt('h1')">H1</button>
-          <button onclick="fmt('ul')">• Liste</button>
-          <button onclick="saveFile()">Sauver</button>
-        </div>
-
-        <div id="editor" class="editor" contenteditable="true" placeholder="Écris tes notes ici..."></div>
-      </div>
-
-      <div style="width:360px">
-        <div class="card small" style="margin-bottom:12px">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>Dictionnaire A→Z</div>
-            <div style="display:flex;gap:6px">
-              <input type="text" id="dictSearch" placeholder="Chercher mot" />
-              <button onclick="newDictItem()">+Entrée</button>
-            </div>
-          </div>
-          <div id="dictList" style="margin-top:8px;max-height:260px;overflow:auto"></div>
-        </div>
-
-        <div class="card small">
-          <div style="display:flex;justify-content:space-between;align-items:center">
-            <div>Paramètres</div>
-            <div style="display:flex;gap:6px">
-              <button onclick="exportAll()">Export</button>
-              <button onclick="importAll()">Import</button>
-            </div>
-          </div>
-          <div style="margin-top:8px" class="small">
-            <div>PIN : <span id="pinInfo">non défini</span></div>
-            <div style="margin-top:6px">Double-clique sur le titre "Calc" pour ouvrir le prompt PIN / long-press pour toggle camo.</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- RIGHT: misc (settings, instructions) -->
-  <div class="right">
-    <div class="card small">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>Mode Camouflage</div>
-        <label style="display:flex;gap:8px;align-items:center">
-          <input type="checkbox" id="camoSwitch" /> Actif
-        </label>
-      </div>
-      <div style="margin-top:8px">
-        <div class="small">Quand le camo est actif, l'interface principale montre la météo. Pour accéder au secret : appuie 4x sur le titre "Calc" ou fais un long press (2s) puis saisis le PIN.</div>
-      </div>
-    </div>
-
-    <div class="card small">
-      <div>Raccourcis</div>
-      <ul>
-        <li>4 taps sur le titre → ouvrir panel secret</li>
-        <li>Long-press titre (2s) → bascule camo</li>
-        <li>Dans secret : Entrée = sauvegarder</li>
-      </ul>
-    </div>
-
-    <div class="card small">
-      <div>Astuce sécurité</div>
-      <div class="small">Vide l'historique du navigateur pour cacher traces ou utilise navigation privée (ne garde pas localStorage).</div>
-    </div>
-  </div>
-</main>
-
-<footer>Made for you. Use responsibly.</footer>
+</div>
 
 <script>
-/* -----------------------------------------
-   Storage keys & initial data
-------------------------------------------*/
-const LS = {
-  PIN: 'secret_pin_v1',
-  FILES: 'secret_files_v1',
-  DICT: 'secret_dict_v1',
-  QUICK: 'secret_quick_v1',
-  CAMO: 'secret_camo_v1'
-};
+let screen = document.getElementById("screen");
+let equalsPressCount = 0;
+let currentTab = "Maths";
 
-let state = {
-  tabs: ['Math','Histoire','Anglais','Physique','Perso'],
-  currentTab: 'Math',
-  currentFileId: null,
-  files: {}, // structure: { tab: [{id,name,content}] }
-  dict: {},  // {word:definition}
-  quick: [], // [{id,title,content}]
-  camoOn: false,
-  taps: 0,
-  longpressTimer: null
-};
-
-/* -----------------------------------------
-   Init
-------------------------------------------*/
-function loadState(){
-  const files = localStorage.getItem(LS.FILES);
-  const dict = localStorage.getItem(LS.DICT);
-  const quick = localStorage.getItem(LS.QUICK);
-  const camo = localStorage.getItem(LS.CAMO);
-
-  state.files = files ? JSON.parse(files) : {};
-  state.dict = dict ? JSON.parse(dict) : {};
-  state.quick = quick ? JSON.parse(quick) : [];
-  state.camoOn = camo ? JSON.parse(camo) : false;
-}
-loadState();
-renderCamo();
-renderQuick();
-renderTabs();
-renderFilesBar();
-renderDict();
-updatePinInfo();
-
-/* -----------------------------------------
-   Calculator functions
-------------------------------------------*/
-let input = "";
-const screen = document.getElementById('screen');
-function press(n){ input += n; screen.textContent = input || '0'; }
-function calc(){ try{ input = String(eval(input)); screen.textContent = input }catch{ screen.textContent='Erreur'; input=''; } }
-function back(){ input = input.slice(0,-1); screen.textContent = input||'0'; }
-function clearAll(){ input=''; screen.textContent='0'; }
-function saveQuickNote(){
-  const id = Date.now().toString(36);
-  state.quick.unshift({id,title:`Note ${state.quick.length+1}`,content:screen.textContent||input||' '});
-  persist(LS.QUICK, state.quick);
-  renderQuick();
-}
-function newQuickNote(){
-  const id = Date.now().toString(36);
-  state.quick.unshift({id,title:`Note ${state.quick.length+1}`,content:''});
-  persist(LS.QUICK, state.quick);
-  renderQuick();
-}
-function renderQuick(){
-  const el = document.getElementById('quickList'); el.innerHTML='';
-  state.quick.forEach(q=>{
-    const d = document.createElement('div'); d.className='file';
-    d.textContent = q.title;
-    d.onclick = ()=>{ const t = prompt('Titre',q.title); if(t!==null){ q.title=t; persist(LS.QUICK,state.quick); renderQuick(); } };
-    d.oncontextmenu = (e)=>{ e.preventDefault(); if(confirm('Suppr ?')){ state.quick = state.quick.filter(x=>x.id!==q.id); persist(LS.QUICK,state.quick); renderQuick(); } };
-    el.appendChild(d);
-  });
+// Calculatrice
+function press(value) { screen.value += value; }
+function clearCalc() { screen.value = ""; }
+function equal() {
+    try { screen.value = eval(screen.value); }
+    catch { screen.value="Erreur"; }
+    equalsPressCount++;
+    if (equalsPressCount>=4) openSecret();
 }
 
-/* -----------------------------------------
-   Secret panel open/lock/camo
-------------------------------------------*/
-const secretArea = document.getElementById('secretArea');
-const calcCard = document.getElementById('calcCard');
-const camoCard = document.getElementById('camoCard');
-const modeLabel = document.getElementById('modeLabel');
-
-function openSecret(){
-  // check PIN if set
-  const pin = localStorage.getItem(LS.PIN);
-  if(pin){
-    const attempt = prompt('Entrez le PIN');
-    if(attempt !== pin){ alert('PIN incorrect'); return; }
-  }
-  showSecret();
-}
-function showSecret(){
-  secretArea.style.display='block';
-  calcCard.style.display='none';
-  camoCard.style.display='none';
-  modeLabel.textContent = 'Mode : Secret actif';
-  renderFilesBar();
-}
-function lockSecret(){
-  secretArea.style.display='none';
-  calcCard.style.display = state.camoOn ? 'none' : 'block';
-  camoCard.style.display = state.camoOn ? 'block' : 'none';
-  modeLabel.textContent = state.camoOn ? 'Mode : Camo' : 'Mode : Calculatrice';
-}
-/* camo toggle */
-document.getElementById('camoSwitch').checked = state.camoOn;
-document.getElementById('camoSwitch').onchange = function(){
-  state.camoOn = this.checked;
-  persist(LS.CAMO, state.camoOn);
-  renderCamo();
-};
-document.getElementById('toggleCamo').onclick = ()=>{
-  state.camoOn = !state.camoOn;
-  document.getElementById('camoSwitch').checked = state.camoOn;
-  persist(LS.CAMO, state.camoOn);
-  renderCamo();
-};
-function renderCamo(){
-  if(state.camoOn){
-    calcCard.style.display='none';
-    camoCard.style.display='block';
-    modeLabel.textContent = 'Mode : Camo';
-  } else {
-    camoCard.style.display='none';
-    calcCard.style.display='block';
-    modeLabel.textContent = 'Mode : Calculatrice';
-  }
+// Mode secret
+function openSecret() {
+    document.getElementById("calc").style.display="none";
+    document.getElementById("secret").style.display="block";
+    equalsPressCount=0;
+    loadNotes(currentTab);
 }
 
-/* -----------------------------------------
-   Tabs & files (per tab)
-------------------------------------------*/
-const tabsBar = document.getElementById('tabsBar');
-function renderTabs(){
-  tabsBar.innerHTML='';
-  state.tabs.forEach(t=>{
-    const b = document.createElement('div');
-    b.className='tab'+(t===state.currentTab?' active':'');
-    b.textContent=t;
-    b.onclick = ()=>{ state.currentTab = t; document.getElementById('currentTab').textContent=t; renderFilesBar(); };
-    tabsBar.appendChild(b);
-  });
-}
-function newFile(){
-  const id = Date.now().toString(36);
-  const tab = state.currentTab;
-  state.files[tab] = state.files[tab] || [];
-  const name = document.getElementById('fileName').value || `Fichier ${state.files[tab].length+1}`;
-  const file = {id,name,content:''};
-  state.files[tab].unshift(file);
-  state.currentFileId = id;
-  persist(LS.FILES, state.files);
-  renderFilesBar();
-  loadCurrentFile();
-}
-function renderFilesBar(){
-  const bar = document.getElementById('filesBar'); bar.innerHTML='';
-  const tab = state.currentTab;
-  const arr = state.files[tab] || [];
-  arr.forEach(f=>{
-    const d=document.createElement('div'); d.className='file'+(f.id===state.currentFileId?' active':'');
-    d.textContent=f.name; d.onclick=()=>{ state.currentFileId=f.id; loadCurrentFile(); renderFilesBar(); };
-    bar.appendChild(d);
-  });
-}
-function loadCurrentFile(){
-  const tab = state.currentTab;
-  const arr = state.files[tab]||[];
-  const f = arr.find(x=>x.id===state.currentFileId) || arr[0];
-  if(f){ state.currentFileId = f.id; document.getElementById('fileName').value = f.name; document.getElementById('editor').innerHTML = f.content; }
-  renderFilesBar();
-}
-function saveFile(){
-  const tab = state.currentTab;
-  state.files[tab] = state.files[tab] || [];
-  if(!state.currentFileId){ newFile(); return; }
-  const f = state.files[tab].find(x=>x.id===state.currentFileId);
-  if(f){ f.name = document.getElementById('fileName').value || f.name; f.content = document.getElementById('editor').innerHTML; persist(LS.FILES, state.files); renderFilesBar(); alert('Sauvé'); }
-}
-function deleteFile(){
-  if(!confirm('Supprimer ce fichier ?')) return;
-  const tab = state.currentTab;
-  state.files[tab] = (state.files[tab]||[]).filter(x=>x.id !== state.currentFileId);
-  state.currentFileId = null;
-  persist(LS.FILES, state.files);
-  renderFilesBar();
-  document.getElementById('editor').innerHTML='';
+function closeSecret() {
+    document.getElementById("secret").style.display="none";
+    document.getElementById("calc").style.display="block";
 }
 
-/* -----------------------------------------
-   Editor formatting
-------------------------------------------*/
-function fmt(cmd){
-  const sel = window.getSelection();
-  if(cmd==='h1'){ document.execCommand('formatBlock', false, 'h1'); return; }
-  if(cmd==='ul'){ document.execCommand('insertUnorderedList'); return; }
-  if(cmd==='bold'){ document.execCommand('bold'); return; }
-  if(cmd==='italic'){ document.execCommand('italic'); return; }
+// Onglets
+function showTab(tab) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    loadNotes(tab);
 }
 
-/* -----------------------------------------
-   Dictionary
-------------------------------------------*/
-function renderDict(){
-  const el=document.getElementById('dictList'); el.innerHTML='';
-  const keys = Object.keys(state.dict).sort((a,b)=>a.localeCompare(b,'fr'));
-  keys.forEach(k=>{
-    const row=document.createElement('div'); row.style.padding='6px 8px'; row.style.borderBottom='1px solid rgba(255,255,255,0.02)';
-    const w=document.createElement('div'); w.textContent=k; w.style.fontWeight='600';
-    const d=document.createElement('div'); d.textContent = state.dict[k]; d.style.fontSize='13px'; d.style.color='var(--muted)';
-    row.appendChild(w); row.appendChild(d);
-    row.oncontextmenu = (e)=>{ e.preventDefault(); if(confirm('Suppr mot ?')){ delete state.dict[k]; persist(LS.DICT,state.dict); renderDict(); } };
-    el.appendChild(row);
-  });
+// Notes
+function saveNotes() {
+    localStorage.setItem("notes_"+currentTab, document.getElementById("notes").value);
+    alert("Notes sauvegardées !");
 }
-function newDictItem(){
-  const w = prompt('Mot (ex: dérivation)');
-  if(!w) return;
-  const d = prompt('Définition / note courte');
-  state.dict[w] = d || '';
-  persist(LS.DICT,state.dict);
-  renderDict();
+function loadNotes(tab) {
+    document.getElementById("notes").value = localStorage.getItem("notes_"+tab) || "";
 }
 
-/* -----------------------------------------
-   Search
-------------------------------------------*/
-document.getElementById('globalSearch').addEventListener('input', (e)=>{
-  const q = e.target.value.toLowerCase();
-  // search across all files
-  const results = [];
-  Object.keys(state.files).forEach(tab=>{
-    (state.files[tab]||[]).forEach(f=>{
-      if((f.name||'').toLowerCase().includes(q) || (f.content||'').toLowerCase().includes(q)){
-        results.push({tab,f});
-      }
-    });
-  });
-  if(!q){ loadCurrentFile(); return; }
-  if(results.length){
-    // open first result
-    state.currentTab = results[0].tab;
-    state.currentFileId = results[0].f.id;
-    renderTabs(); renderFilesBar(); loadCurrentFile();
-  } else {
-    document.getElementById('editor').innerHTML = '<div class="small">Aucun résultat</div>';
-  }
-});
-document.getElementById('dictSearch').addEventListener('input', (e)=>{
-  const q = e.target.value.toLowerCase();
-  const el=document.getElementById('dictList'); el.innerHTML='';
-  Object.keys(state.dict).filter(k=>k.toLowerCase().includes(q)).sort().forEach(k=>{
-    const row=document.createElement('div'); row.style.padding='6px 8px';
-    const w=document.createElement('div'); w.textContent=k; w.style.fontWeight='600';
-    const d=document.createElement('div'); d.textContent = state.dict[k]; d.style.fontSize='13px'; d.style.color='var(--muted)';
-    row.appendChild(w); row.appendChild(d);
-    el.appendChild(row);
-  });
-});
-
-/* -----------------------------------------
-   PIN management
-------------------------------------------*/
-function updatePinInfo(){
-  const pin = localStorage.getItem(LS.PIN);
-  document.getElementById('pinInfo').textContent = pin ? 'défini' : 'non défini';
+// Dictionnaire
+function toggleDictionary() {
+    const dic = document.getElementById("dictionary");
+    dic.style.display = dic.style.display === "none" ? "block" : "none";
 }
-document.getElementById('title').addEventListener('dblclick', ()=>{
-  // open PIN prompt manager
-  const pin = localStorage.getItem(LS.PIN);
-  if(pin){
-    if(!confirm('PIN existant. Voulez-vous le supprimer ?')) return;
-    localStorage.removeItem(LS.PIN);
-    updatePinInfo();
-    alert('PIN supprimé');
-  } else {
-    const p = prompt('Choisis un PIN (4-8 chiffres)');
-    if(p && /^\d{4,8}$/.test(p)){ localStorage.setItem(LS.PIN,p); updatePinInfo(); alert('PIN défini'); }
-    else alert('PIN invalide');
-  }
-});
-
-/* 4 taps and long-press detection */
-const titleEl = document.getElementById('title');
-titleEl.addEventListener('click', ()=>{
-  state.taps++;
-  clearTimeout(state.tapTimer);
-  state.tapTimer = setTimeout(()=>{ state.taps=0; }, 800);
-  if(state.taps >= 4){ state.taps=0; openSecret(); }
-});
-titleEl.addEventListener('mousedown', ()=>{
-  state.longpressTimer = setTimeout(()=>{ // long press toggles camo
-    state.camoOn = !state.camoOn;
-    document.getElementById('camoSwitch').checked = state.camoOn;
-    persist(LS.CAMO, state.camoOn);
-    renderCamo();
-  }, 1200);
-});
-titleEl.addEventListener('mouseup', ()=>{ clearTimeout(state.longpressTimer); });
-
-/* -----------------------------------------
-   Export / Import
-------------------------------------------*/
-function exportAll(){
-  const data = {files:state.files, dict:state.dict, quick:state.quick, camo:state.camoOn};
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'secret_backup.json'; a.click();
-  URL.revokeObjectURL(url);
-}
-function importAll(){
-  const inp = document.createElement('input'); inp.type='file'; inp.accept='application/json';
-  inp.onchange = e=>{
-    const f = e.target.files[0]; if(!f) return;
-    const reader = new FileReader();
-    reader.onload = ev=>{
-      try{
-        const d = JSON.parse(ev.target.result);
-        state.files = d.files || state.files;
-        state.dict = d.dict || state.dict;
-        state.quick = d.quick || state.quick;
-        state.camoOn = typeof d.camo === 'boolean' ? d.camo : state.camoOn;
-        persist(LS.FILES, state.files); persist(LS.DICT, state.dict); persist(LS.QUICK, state.quick); persist(LS.CAMO, state.camoOn);
-        renderDict(); renderQuick(); renderFilesBar(); renderCamo();
-        alert('Import OK');
-      }catch(err){ alert('Fichier invalide'); }
-    };
-    reader.readAsText(f);
-  };
-  inp.click();
-}
-
-/* -----------------------------------------
-   Persistence helper
-------------------------------------------*/
-function persist(k,v){ localStorage.setItem(k, JSON.stringify(v)); }
-
-/* -----------------------------------------
-   Utilities and initial load
-------------------------------------------*/
-function persistRaw(k,v){ localStorage.setItem(k,v); }
-function persistObj(key,obj){ localStorage.setItem(key, JSON.stringify(obj)); }
-
-/* load first file if exists */
-if(Object.keys(state.files).length){
-  // choose first tab that has files
-  for(const t of state.tabs){
-    if((state.files[t]||[]).length){
-      state.currentTab = t;
-      state.currentFileId = state.files[t][0].id;
-      break;
-    }
-  }
-  renderTabs(); renderFilesBar(); loadCurrentFile();
-}
-
-/* dict quick demo if empty */
-if(Object.keys(state.dict).length===0){
-  state.dict['Théorème de Pythagore'] = 'Dans un triangle rectangle, a² + b² = c²';
-  state.dict['Dérivation'] = 'Opération qui calcule la pente instantanée d\'une fonction';
-  persist(LS.DICT,state.dict);
-  renderDict();
-}
-
-/* persist files on unload */
-window.addEventListener('beforeunload', ()=>{
-  persist(LS.FILES, state.files);
-  persist(LS.DICT, state.dict);
-  persist(LS.QUICK, state.quick);
-  persist(LS.CAMO, state.camoOn);
-});
-
-/* helper to export raw saved files */
-function importAll(){ /* defined above to allow button binding */ }
-
-/* small helper to updatePinInfo initially */
-updatePinInfo();
 </script>
 
 </body>
