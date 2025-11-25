@@ -2,71 +2,72 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Calculatrice</title>
+<title>Calculatrice Collège</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 body {
     background:#111; color:white; font-family:Arial;
     display:flex; justify-content:center; align-items:center;
-    height:100vh; margin:0;
+    min-height:100vh; margin:0; padding:10px;
 }
 #calc, #secret {
-    width:320px; padding:20px; border-radius:15px;
-    background:#222; box-shadow:0 0 20px #000;
+    width:100%; max-width:360px; padding:15px; border-radius:15px;
+    background:#222; box-shadow:0 0 15px #000;
+    box-sizing:border-box;
 }
 #screen {
-    width:100%; height:60px; font-size:28px;
+    width:100%; height:60px; font-size:24px;
     text-align:right; padding:10px; border:none;
     background:#000; color:#0f0; border-radius:10px;
-    margin-bottom:15px;
+    margin-bottom:10px;
+    box-sizing:border-box;
+}
+.button-row {
+    display:flex; flex-wrap:wrap; justify-content:space-between;
 }
 button {
-    width:70px; height:70px; margin:5px;
-    font-size:24px; border:none; border-radius:10px;
+    flex:1 1 22%; margin:5px 2%; height:60px;
+    font-size:22px; border:none; border-radius:10px;
     background:#333; color:white; cursor:pointer;
+    min-width:50px;
 }
-#secret { display:none; }
-.tabs { display:flex; margin-bottom:10px; }
-.tab { flex:1; padding:8px; text-align:center; cursor:pointer; background:#333; border-radius:10px; margin-right:5px; }
+#secret { display:none; max-height:80vh; overflow:auto; }
+.tabs { display:flex; flex-wrap:wrap; margin-bottom:10px; }
+.tab { flex:1 1 48%; padding:8px; text-align:center; cursor:pointer; background:#333; border-radius:10px; margin:2px; font-size:14px;}
 .tab.active { background:#0f0; color:#000; }
-textarea { width:100%; height:200px; background:#000; color:#0f0; padding:10px; font-size:16px; border-radius:10px; border:none; margin-bottom:10px; }
-#dictionary { display:none; background:#111; padding:10px; border-radius:10px; height:200px; overflow:auto; }
+textarea { width:100%; height:200px; background:#000; color:#0f0; padding:10px; font-size:16px; border-radius:10px; border:none; margin-bottom:10px; box-sizing:border-box; }
+#dictionary { display:none; background:#111; padding:10px; border-radius:10px; max-height:200px; overflow:auto; }
 </style>
 </head>
 <body>
 
-<!-- CALCULATRICE -->
 <div id="calc">
     <input type="text" id="screen" disabled>
-    <div>
+    <div class="button-row">
         <button onclick="press('7')">7</button>
         <button onclick="press('8')">8</button>
         <button onclick="press('9')">9</button>
         <button onclick="press('/')">/</button>
-    </div>
-    <div>
+
         <button onclick="press('4')">4</button>
         <button onclick="press('5')">5</button>
         <button onclick="press('6')">6</button>
         <button onclick="press('*')">*</button>
-    </div>
-    <div>
+
         <button onclick="press('1')">1</button>
         <button onclick="press('2')">2</button>
         <button onclick="press('3')">3</button>
         <button onclick="press('-')">-</button>
-    </div>
-    <div>
+
         <button onclick="press('0')">0</button>
         <button onclick="press('.')">.</button>
         <button onclick="equal()">=</button>
         <button onclick="press('+')">+</button>
-    </div>
-    <div>
-        <button style="width:150px" onclick="clearCalc()">C</button>
+
+        <button style="flex:1 1 100%" onclick="clearCalc()">C</button>
     </div>
 </div>
 
-<!-- MODE SECRET -->
 <div id="secret">
     <div class="tabs">
         <div class="tab active" onclick="showTab('Maths')">Maths</div>
@@ -99,7 +100,6 @@ let screen = document.getElementById("screen");
 let equalsPressCount = 0;
 let currentTab = "Maths";
 
-// Calculatrice
 function press(value) { screen.value += value; }
 function clearCalc() { screen.value = ""; }
 function equal() {
@@ -109,7 +109,6 @@ function equal() {
     if (equalsPressCount>=4) openSecret();
 }
 
-// Mode secret
 function openSecret() {
     document.getElementById("calc").style.display="none";
     document.getElementById("secret").style.display="block";
@@ -122,7 +121,6 @@ function closeSecret() {
     document.getElementById("calc").style.display="block";
 }
 
-// Onglets
 function showTab(tab) {
     currentTab = tab;
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -130,7 +128,6 @@ function showTab(tab) {
     loadNotes(tab);
 }
 
-// Notes
 function saveNotes() {
     localStorage.setItem("notes_"+currentTab, document.getElementById("notes").value);
     alert("Notes sauvegardées !");
@@ -139,7 +136,6 @@ function loadNotes(tab) {
     document.getElementById("notes").value = localStorage.getItem("notes_"+tab) || "";
 }
 
-// Dictionnaire
 function toggleDictionary() {
     const dic = document.getElementById("dictionary");
     dic.style.display = dic.style.display === "none" ? "block" : "none";
