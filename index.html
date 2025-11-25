@@ -1,146 +1,225 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Calculatrice Collège</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body {
-    background:#111; color:white; font-family:Arial;
-    display:flex; justify-content:center; align-items:center;
-    min-height:100vh; margin:0; padding:10px;
-}
-#calc, #secret {
-    width:100%; max-width:360px; padding:15px; border-radius:15px;
-    background:#222; box-shadow:0 0 15px #000;
-    box-sizing:border-box;
-}
-#screen {
-    width:100%; height:60px; font-size:24px;
-    text-align:right; padding:10px; border:none;
-    background:#000; color:#0f0; border-radius:10px;
-    margin-bottom:10px;
-    box-sizing:border-box;
-}
-.button-row {
-    display:flex; flex-wrap:wrap; justify-content:space-between;
-}
-button {
-    flex:1 1 22%; margin:5px 2%; height:60px;
-    font-size:22px; border:none; border-radius:10px;
-    background:#333; color:white; cursor:pointer;
-    min-width:50px;
-}
-#secret { display:none; max-height:80vh; overflow:auto; }
-.tabs { display:flex; flex-wrap:wrap; margin-bottom:10px; }
-.tab { flex:1 1 48%; padding:8px; text-align:center; cursor:pointer; background:#333; border-radius:10px; margin:2px; font-size:14px;}
-.tab.active { background:#0f0; color:#000; }
-textarea { width:100%; height:200px; background:#000; color:#0f0; padding:10px; font-size:16px; border-radius:10px; border:none; margin-bottom:10px; box-sizing:border-box; }
-#dictionary { display:none; background:#111; padding:10px; border-radius:10px; max-height:200px; overflow:auto; }
-</style>
+  <meta charset="UTF-8" />
+  <title>Calc + Notes + Dictionnaire 5000</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body { background:#111; color:white; font-family:Arial; padding:10px; }
+    #calc, #secret { max-width:360px; margin:auto; background:#222; padding:15px; border-radius:10px; }
+    #screen { width:100%; height:50px; background:#000; color:#0f0; font-size:24px; border:none; padding:10px; margin-bottom:10px; border-radius:5px; box-sizing: border-box; }
+    .button-row { display:flex; flex-wrap:wrap; justify-content:space-between; }
+    button { flex:1 1 22%; margin:5px 2%; height:55px; font-size:20px; background:#333; color:white; border:none; border-radius:8px; cursor:pointer; min-width:50px; }
+    #secret { display:none; max-height:80vh; overflow:auto; box-sizing: border-box; }
+    input, textarea { width:100%; margin-bottom:10px; border-radius:8px; border:none; padding:8px; box-sizing: border-box; }
+    #dict-entries { max-height:300px; overflow:auto; background:#111; padding:10px; border-radius:8px; }
+    .dict-entry { margin-bottom:8px; }
+    .dict-word { font-weight:bold; }
+    .dict-def { margin-left:6px; font-size:14px; color:#ccc; }
+    .tabs { display:flex; flex-wrap:wrap; margin-bottom:10px; }
+    .tab { flex:1 1 30%; padding:8px; text-align:center; cursor:pointer; background:#333; border-radius:10px; margin:2px; font-size:14px; }
+    .tab.active { background:#0f0; color:#000; }
+  </style>
 </head>
 <body>
 
-<div id="calc">
+  <div id="calc">
     <input type="text" id="screen" disabled>
     <div class="button-row">
-        <button onclick="press('7')">7</button>
-        <button onclick="press('8')">8</button>
-        <button onclick="press('9')">9</button>
-        <button onclick="press('/')">/</button>
-
-        <button onclick="press('4')">4</button>
-        <button onclick="press('5')">5</button>
-        <button onclick="press('6')">6</button>
-        <button onclick="press('*')">*</button>
-
-        <button onclick="press('1')">1</button>
-        <button onclick="press('2')">2</button>
-        <button onclick="press('3')">3</button>
-        <button onclick="press('-')">-</button>
-
-        <button onclick="press('0')">0</button>
-        <button onclick="press('.')">.</button>
-        <button onclick="equal()">=</button>
-        <button onclick="press('+')">+</button>
-
-        <button style="flex:1 1 100%" onclick="clearCalc()">C</button>
+      <button onclick="press('7')">7</button>
+      <button onclick="press('8')">8</button>
+      <button onclick="press('9')">9</button>
+      <button onclick="press('/')">/</button>
+      <button onclick="press('4')">4</button>
+      <button onclick="press('5')">5</button>
+      <button onclick="press('6')">6</button>
+      <button onclick="press('*')">*</button>
+      <button onclick="press('1')">1</button>
+      <button onclick="press('2')">2</button>
+      <button onclick="press('3')">3</button>
+      <button onclick="press('-')">-</button>
+      <button onclick="press('0')">0</button>
+      <button onclick="press('.')">.</button>
+      <button onclick="equal()">=</button>
+      <button onclick="press('+')">+</button>
+      <button style="flex:1 1 100%" onclick="clearCalc()">C</button>
     </div>
-</div>
+  </div>
 
-<div id="secret">
+  <div id="secret">
     <div class="tabs">
-        <div class="tab active" onclick="showTab('Maths')">Maths</div>
-        <div class="tab" onclick="showTab('Francais')">Français</div>
-        <div class="tab" onclick="showTab('Histoire')">Histoire-Géo</div>
-        <div class="tab" onclick="showTab('SVT')">SVT</div>
-        <div class="tab" onclick="showTab('Physique')">Physique-Chimie</div>
-        <div class="tab" onclick="showTab('Anglais')">Anglais</div>
-        <div class="tab" onclick="showTab('Techno')">Technologie</div>
-        <div class="tab" onclick="showTab('EMC')">EMC</div>
+      <div class="tab active" onclick="showTab('Maths', this)">Maths</div>
+      <div class="tab" onclick="showTab('Francais', this)">Français</div>
+      <div class="tab" onclick="showTab('Histoire', this)">Histoire‑Géo</div>
+      <div class="tab" onclick="showTab('SVT', this)">SVT</div>
+      <div class="tab" onclick="showTab('Physique', this)">Phys‑Chimie</div>
+      <div class="tab" onclick="showTab('Anglais', this)">Anglais</div>
+      <div class="tab" onclick="showTab('Techno', this)">Technologie</div>
+      <div class="tab" onclick="showTab('EMC', this)">EMC</div>
     </div>
 
-    <textarea id="notes"></textarea>
-    <button onclick="saveNotes()" style="width:100%;margin-bottom:10px;">Sauvegarder</button>
-    <button onclick="toggleDictionary()" style="width:100%;margin-bottom:10px;">Dictionnaire</button>
-    <button onclick="closeSecret()" style="width:100%;">Fermer</button>
+    <textarea id="notes" placeholder="Écris tes notes ici…"></textarea>
+    <button onclick="saveNotes()" style="width:100%; margin-bottom:10px;">Sauvegarder</button>
 
-    <div id="dictionary">
-        <h3>Dictionnaire</h3>
-        <p><b>Exemple:</b> Théorème de Pythagore → a²+b²=c²</p>
-        <p>Photosynthèse → Processus par lequel les plantes produisent leur nourriture</p>
-        <p>Électricité → Circulation des électrons dans un conducteur</p>
-        <p>Exercice → Petit problème ou activité pour s’entraîner</p>
-        <p>Etc…</p>
-    </div>
-</div>
+    <input type="text" id="dict-search" placeholder="Chercher un mot…">
+    <div id="dict-entries">Chargement dictionnaire…</div>
 
-<script>
-let screen = document.getElementById("screen");
-let equalsPressCount = 0;
-let currentTab = "Maths";
+    <button onclick="closeSecret()" style="width:100%; margin-top:10px;">Fermer</button>
+  </div>
 
-function press(value) { screen.value += value; }
-function clearCalc() { screen.value = ""; }
-function equal() {
-    try { screen.value = eval(screen.value); }
-    catch { screen.value="Erreur"; }
-    equalsPressCount++;
-    if (equalsPressCount>=4) openSecret();
-}
+  <!-- DICTIONNAIRE BLOCS -->
 
-function openSecret() {
-    document.getElementById("calc").style.display="none";
-    document.getElementById("secret").style.display="block";
-    equalsPressCount=0;
-    loadNotes(currentTab);
-}
+  <script>
+  const dict1 = [
+    {word:"abstrait", definition:"Qui ne se conçoit que par l’intelligence."},
+    {word:"algèbre", definition:"Partie des mathématiques étudiée en collège."},
+    {word:"atome", definition:"Plus petite unité constitutive de la matière."},
+    {word:"biodiversité", definition:"Diversité des espèces vivantes dans un écosystème."},
+    {word:"cellule", definition:"Unité de base de tout organisme vivant."},
+    {word:"chimie", definition:"Science qui étudie les substances et leurs transformations."},
+    {word:"dynamique", definition:"Relatif au mouvement et aux forces."},
+    {word:"énergie", definition:"Capacité d’un système à produire un travail ou un changement."},
+    {word:"force", definition:"Influence capable de modifier l’état de mouvement d’un objet."},
+    {word:"géométrie", definition:"Branche des mathématiques qui étudie les formes et les figures."}
+    // … (ajoute jusqu’à ~1000 entrées ici)
+  ];
+  </script>
 
-function closeSecret() {
-    document.getElementById("secret").style.display="none";
-    document.getElementById("calc").style.display="block";
-}
+  <script>
+  const dict2 = [
+    {word:"gravité", definition:"Force d’attraction entre des masses."},
+    {word:"hydrogène", definition:"Élément chimique de symbole H."},
+    {word:"intégrale", definition:"Somme continue d’éléments en mathématiques."},
+    {word:"jonction", definition:"Point de réunion ou d’union."},
+    {word:"kilogramme", definition:"Unité de masse dans le Système International (kg)."},
+    {word:"liberté", definition:"État d’une personne lorsqu’elle n’est pas contrainte."},
+    {word:"molécule", definition:"Regroupement d’atomes liés entre eux."},
+    {word:"noyau", definition:"Partie centrale d’un atome."},
+    {word:"oscillation", definition:"Mouvement périodique d’un système autour d’un point d’équilibre."},
+    {word:"photosynthèse", definition:"Processus par lequel les plantes produisent leur énergie."}
+    // … (jusqu’à ~1000 entrées)
+  ];
+  </script>
 
-function showTab(tab) {
-    currentTab = tab;
-    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-    event.target.classList.add('active');
-    loadNotes(tab);
-}
+  <script>
+  const dict3 = [
+    // Exemple mots 2001 à 3000
+    {word:"pression", definition:"Force par unité de surface."},
+    {word:"quantité", definition:"Mesure de quelque chose."},
+    {word:"réaction", definition:"Processus chimique entre des substances."},
+    {word:"système", definition:"Ensemble d’éléments en interaction."},
+    {word:"température", definition:"Mesure de la chaleur ou de l’agitation moléculaire."},
+    {word:"unité", definition:"Élément de base de mesure."},
+    {word:"vecteur", definition:"Grandeur ayant une direction et une amplitude."},
+    {word:"volume", definition:"Espace occupé par un objet."},
+    {word:"watt", definition:"Unité de puissance électrique."},
+    {word:"zoologie", definition:"Étude des animaux."}
+    // … (jusqu’à ~1000 entrées)
+  ];
+  </script>
 
-function saveNotes() {
-    localStorage.setItem("notes_"+currentTab, document.getElementById("notes").value);
-    alert("Notes sauvegardées !");
-}
-function loadNotes(tab) {
-    document.getElementById("notes").value = localStorage.getItem("notes_"+tab) || "";
-}
+  <script>
+  const dict4 = [
+    // Exemple mots 3001 à 4000
+    {word:"acide", definition:"Molécule pouvant libérer un proton H+."},
+    {word:"base", definition:"Molécule pouvant accepter un proton."},
+    {word:"catalyseur", definition:"Substance qui accélère une réaction chimique sans être consommée."},
+    {word:"diagramme", definition:"Représentation graphique de données."},
+    {word:"élasticité", definition:"Capacité d’un matériau à reprendre sa forme initiale."},
+    {word:"fibre", definition:"Fil très fin."},
+    {word:"grammage", definition:"Masse d’un matériau par unité de surface."},
+    {word:"homogène", definition:"Qui a la même composition partout."},
+    {word:"ion", definition:"Atome ou molécule chargé électriquement."},
+    {word:"joule", definition:"Unité d’énergie dans le Système International."}
+    // … (jusqu’à ~1000 entrées)
+  ];
+  </script>
 
-function toggleDictionary() {
-    const dic = document.getElementById("dictionary");
-    dic.style.display = dic.style.display === "none" ? "block" : "none";
-}
-</script>
+  <script>
+  const dict5 = [
+    // Exemple mots 4001 à 5000
+    {word:"kilowatt", definition:"Unité de puissance égale à 1000 watts."},
+    {word:"laser", definition:"Dispositif émettant un faisceau cohérent de photons."},
+    {word:"molalité", definition:"Concentration d’un soluté par rapport à la masse du solvant."},
+    {word:"néon", definition:"Gaz noble de symbole Ne."},
+    {word:"oxydation", definition:"Réaction impliquant la perte d’électrons."},
+    {word:"photon", definition:"Particule de lumière."},
+    {word:"quantique", definition:"Relatif à la mécanique quantique."},
+    {word:"relativité", definition:"Théorie d’Einstein sur l’espace-temps."},
+    {word:"sismique", definition:"Relatif aux tremblements de terre."},
+    {word:"turbine", definition:"Machine qui convertit l’énergie d’un fluide en travail."}
+    // … (jusqu’à ~1000 entrées)
+  ];
+  </script>
+
+  <script>
+  // Combine tous les blocs
+  const dictionary = [].concat(dict1, dict2, dict3, dict4, dict5);
+  </script>
+
+  <script>
+    let screen = document.getElementById("screen");
+    let equalsPressCount = 0;
+    let currentTab = "Maths";
+
+    // Fonctions calculatrice
+    function press(v) { screen.value += v; }
+    function clearCalc() { screen.value = ""; }
+    function equal() {
+      try { screen.value = eval(screen.value); }
+      catch { screen.value = "Erreur"; }
+      equalsPressCount++;
+      if (equalsPressCount >= 4) openSecret();
+    }
+
+    // Fonctions mode secret
+    function openSecret() {
+      document.getElementById("calc").style.display = "none";
+      document.getElementById("secret").style.display = "block";
+      equalsPressCount = 0;
+      loadNotes();
+      renderDict();
+    }
+    function closeSecret() {
+      document.getElementById("secret").style.display = "none";
+      document.getElementById("calc").style.display = "block";
+    }
+
+    // Notes onglets
+    function showTab(tab, el) {
+      currentTab = tab;
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+      loadNotes();
+    }
+    function saveNotes() {
+      localStorage.setItem("notes_" + currentTab, document.getElementById("notes").value);
+      alert("Notes sauvegardées !");
+    }
+    function loadNotes() {
+      document.getElementById("notes").value = localStorage.getItem("notes_" + currentTab) || "";
+    }
+
+    // Dictionnaire / Recherche
+    document.getElementById('dict-search').addEventListener('input', renderDict);
+
+    function renderDict() {
+      const container = document.getElementById('dict-entries');
+      container.innerHTML = "";
+      const q = document.getElementById('dict-search').value.toLowerCase();
+      const results = dictionary.filter(e => e.word.toLowerCase().includes(q));
+      results.slice(0, 200).forEach(e => {
+        const div = document.createElement('div');
+        div.className = 'dict-entry';
+        div.innerHTML = `<span class="dict-word">${e.word}</span>: <span class="dict-def">${e.definition}</span>`;
+        container.appendChild(div);
+      });
+      if (results.length === 0) {
+        container.innerHTML = '<div class="dict-entry">Aucun mot trouvé</div>';
+      }
+    }
+  </script>
 
 </body>
 </html>
