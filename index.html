@@ -3,421 +3,108 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Évaluations 4ème – Ultimate App</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>Mission du Jour TikTok</title>
 <style>
-body { font-family: Arial; margin:0; padding:0; background:#121212; color:#eee; }
-h1 { text-align:center; margin:20px 0; }
-.tab { display:flex; flex-wrap:wrap; background:#333; }
-.tab button { flex:1; padding:14px 16px; cursor:pointer; background:#333; color:white; border:none; outline:none; transition:0.3s; font-size:16px; }
-.tab button:hover { background:#555; }
-.tab button.active { background:#007bff; }
-.tabcontent { display:none; padding:20px; background:#1e1e1e; border-top:none; }
-.category { margin-bottom:20px; }
-.eval { background:#2a2a2a; padding:10px; margin-top:10px; border-radius:10px; }
-.eval h3 { margin:0 0 8px 0; display:flex; align-items:center; gap:10px; }
-.eval img { max-width:100%; margin-top:5px; border-radius:5px; }
-button.pdf { margin-top:5px; padding:5px 10px; cursor:pointer; border-radius:5px; border:none; background:#007bff; color:white; }
-#search { width:95%; margin:10px auto; display:block; padding:10px; border-radius:5px; border:none; font-size:16px; }
+    body { font-family: Arial; background: #e0f7fa; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+    h1 { color: #00796b; }
+    .card { background: #fff; padding: 20px; margin: 10px; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-align: center; max-width: 400px; width: 100%; }
+    input, button { padding: 10px; margin: 5px; border-radius: 5px; border: none; }
+    button { background-color: #00796b; color: white; cursor: pointer; font-weight: bold; }
+    button:hover { background-color: #004d40; }
+    #leaderboard { margin-top: 30px; width: 100%; max-width: 400px; }
+    #leaderboard table { width: 100%; border-collapse: collapse; }
+    td, th { padding: 8px; text-align: center; border-bottom: 1px solid #ccc; }
 </style>
 </head>
 <body>
 
-<h1>Évaluations 4ème – Ultimate App</h1>
-<input type="text" id="search" placeholder="🔍 Rechercher un exercice...">
+<h1>Mission du Jour TikTok</h1>
 
-<div class="tab">
-  <button class="tablinks" onclick="openTab(event,'Maths')" id="defaultOpen">Maths</button>
-  <button class="tablinks" onclick="openTab(event,'Français')">Français</button>
-  <button class="tablinks" onclick="openTab(event,'Anglais')">Anglais</button>
-  <button class="tablinks" onclick="openTab(event,'Espagnol')">Espagnol</button>
-  <button class="tablinks" onclick="openTab(event,'Histoire')">Histoire-Géo</button>
-  <button class="tablinks" onclick="openTab(event,'SVT')">SVT</button>
-  <button class="tablinks" onclick="openTab(event,'Physique')">Physique-Chimie</button>
-  <button class="tablinks" onclick="openTab(event,'Technologie')">Technologie</button>
-  <button class="tablinks" onclick="openTab(event,'Arts')">Arts Plastiques</button>
-  <button class="tablinks" onclick="openTab(event,'Musique')">Musique</button>
-  <button class="tablinks" onclick="openTab(event,'EPS')">EPS</button>
+<div class="card" id="login-card">
+    <h2>Connexion TikTok (simulée)</h2>
+    <input type="text" id="username" placeholder="Entrez votre pseudo TikTok">
+    <button onclick="login()">Se connecter</button>
 </div>
 
-<!-- ===== MATHS ===== -->
-<div id="Maths" class="tabcontent">
-  <div class="category">
-    <h2>📐 Maths</h2><!-- Exemple d'évaluations Maths (suite) -->
-    <div class="eval" data-keywords="équation inconnue résoudre">
-      <h3>🧮 Équations</h3>
-      <ul>
-        <li>Résoudre : 2x + 5 = 13</li>
-        <li>Résoudre : 3(x - 2) = 9</li>
-        <li>Vérifier les solutions</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Maths - Équations','',['Résoudre : 2x + 5 = 13','Résoudre : 3(x - 2) = 9','Vérifier les solutions'])">Télécharger PDF</button>
+<div class="card" id="mission-card" style="display:none;">
+    <h3 id="profile-name"></h3>
+    <div id="mission">Cliquez pour générer votre mission du jour !</div>
+    <button onclick="generateMission()">Nouvelle mission</button>
+    <div style="margin:10px;">
+        <input type="text" id="tiktok-link" placeholder="Lien vidéo TikTok avec #missiontodaybro" style="width:90%">
+        <button onclick="submitVideo()">Valider vidéo</button>
     </div>
-
-    <div class="eval" data-keywords="fonctions graphique lecture valeur">
-      <h3>📈 Fonctions</h3>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Function_example.svg/320px-Function_example.svg.png" alt="Graphique fonction">
-      <ul>
-        <li>Lire les valeurs sur le graphique</li>
-        <li>Identifier les points particuliers</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Maths - Fonctions','https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Function_example.svg/320px-Function_example.svg.png',['Lire les valeurs sur le graphique','Identifier les points particuliers'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="géométrie angles parallèles triangles">
-      <h3>📐 Géométrie</h3>
-      <ul>
-        <li>Calculer les angles dans un triangle</li>
-        <li>Tracer des droites parallèles et perpendiculaires</li>
-        <li>Résoudre un petit problème de géométrie plane</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Maths - Géométrie','',['Calculer les angles dans un triangle','Tracer des droites parallèles et perpendiculaires','Résoudre un petit problème de géométrie plane'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="probabilités lancer dé tirage">
-      <h3>🎲 Probabilités</h3>
-      <ul>
-        <li>Calculer la probabilité de tirer un as dans un jeu de cartes</li>
-        <li>Probabilité d’obtenir un nombre pair en lançant un dé</li>
-        <li>Probabilité de tirer une boule rouge dans un sac</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Maths - Probabilités','',['Calculer la probabilité de tirer un as dans un jeu de cartes','Probabilité d’obtenir un nombre pair en lançant un dé','Probabilité de tirer une boule rouge dans un sac'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="statistiques diagramme moyenne médiane mode">
-      <h3>📊 Statistiques avancées</h3>
-      <ul>
-        <li>Calculer la moyenne et la médiane d’une série</li>
-        <li>Identifier le mode d’un diagramme</li>
-        <li>Lire un diagramme en bâtons</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Maths - Statistiques avancées','',['Calculer la moyenne et la médiane d’une série','Identifier le mode d’un diagramme','Lire un diagramme en bâtons'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div><!-- ===== FRANÇAIS ===== -->
-<div id="Français" class="tabcontent">
-  <div class="category">
-    <h2>📚 Français</h2>
-
-    <div class="eval" data-keywords="compréhension texte lecture analyse">
-      <h3>📖 Compréhension de texte</h3>
-      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Lecture-francais.png/320px-Lecture-francais.png" alt="Lecture">
-      <ul>
-        <li>Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?</li>
-        <li>Identifier les champs lexicaux importants</li>
-        <li>Répondre à 5 questions de compréhension</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Français - Compréhension','https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Lecture-francais.png/320px-Lecture-francais.png',['Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?','Identifier les champs lexicaux importants','Répondre à 5 questions de compréhension'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="rédaction créativité expression">
-      <h3>✍️ Rédaction</h3>
-      <ul>
-        <li>Écrire un texte narratif de 15 lignes</li>
-        <li>Décrire un personnage et son environnement</li>
-        <li>Exprimer une opinion personnelle</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Français - Rédaction','',['Écrire un texte narratif de 15 lignes','Décrire un personnage et son environnement','Exprimer une opinion personnelle'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="grammaire conjugaison orthographe">
-      <h3>📝 Grammaire & Conjugaison</h3>
-      <ul>
-        <li>Identifier COD et COI dans 5 phrases</li>
-        <li>Conjuguer au conditionnel présent et imparfait</li>
-        <li>Corriger les fautes d’orthographe dans un texte court</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Français - Grammaire','',['Identifier COD et COI dans 5 phrases','Conjuguer au conditionnel présent et imparfait','Corriger les fautes d’orthographe dans un texte court'])">Télécharger PDF</button>
-    </div>
-
-  </div>
+    <div>Coins : <span id="coins">0</span></div>
 </div>
 
-<!-- ===== ANGLAIS ===== -->
-<div id="Anglais" class="tabcontent">
-  <div class="category">
-    <h2>🇬🇧 Anglais</h2>
-
-    <div class="eval" data-keywords="compréhension lecture grammaire vocabulaire">
-      <h3>📖 Compréhension écrite</h3>
-      <ul>
-        <li>Lire un texte et répondre à 5 questions</li>
-        <li>Identifier les temps verbaux utilisés</li>
-        <li>Relever le vocabulaire spécifique</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Anglais - Compréhension','',['Lire un texte et répondre à 5 questions','Identifier les temps verbaux utilisés','Relever le vocabulaire spécifique'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="expression écrite rédaction">
-      <h3>✍️ Expression écrite</h3>
-      <ul>
-        <li>Écrire un petit texte sur une journée scolaire</li>
-        <li>Décrire un personnage et ses activités</li>
-        <li>Écrire un dialogue simple entre deux personnes</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Anglais - Expression','',['Écrire un petit texte sur une journée scolaire','Décrire un personnage et ses activités','Écrire un dialogue simple entre deux personnes'])">Télécharger PDF</button>
-    </div>
-
-  </div>
+<div id="leaderboard">
+    <h2>Classement</h2>
+    <table>
+        <thead><tr><th>Pseudo</th><th>Coins</th></tr></thead>
+        <tbody id="leaderboard-body"></tbody>
+    </table>
 </div>
 
-<!-- ===== ESPAGNOL ===== -->
-<div id="Espagnol" class="tabcontent">
-  <div class="category">
-    <h2>🇪🇸 Espagnol</h2>
+<script>
+const missions = [
+    "Faire une pause de 10 min et méditer",
+    "Apprendre un nouveau mot en anglais",
+    "Envoyer un message sympa à un ami",
+    "Faire 20 min de sport",
+    "Écrire 3 choses pour lesquelles tu es reconnaissant",
+    "Boire un verre d'eau toutes les heures",
+    "Lire un article intéressant",
+    "Nettoyer et organiser ton bureau",
+    "Écouter une nouvelle musique",
+    "Faire un compliment sincère à quelqu'un"
+];
 
-    <div class="eval" data-keywords="vocabulaire compréhension grammaire">
-      <h3>📖 Compréhension & vocabulaire</h3>
-      <ul>
-        <li>Traduire 5 phrases simples</li>
-        <li>Identifier les verbes conjugués</li>
-        <li>Compléter des phrases avec le vocabulaire approprié</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Espagnol - Compréhension','',['Traduire 5 phrases simples','Identifier les verbes conjugués','Compléter des phrases avec le vocabulaire approprié'])">Télécharger PDF</button>
-    </div>
+let currentUser = null;
+let leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || {};
 
-    <div class="eval" data-keywords="expression écrite rédaction">
-      <h3>✍️ Expression écrite</h3>
-      <ul>
-        <li>Écrire un texte sur sa famille ou ses loisirs</li>
-        <li>Décrire sa journée typique</li>
-        <li>Rédiger une courte lettre ou e-mail</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Espagnol - Expression','',['Écrire un texte sur sa famille ou ses loisirs','Décrire sa journée typique','Rédiger une courte lettre ou e-mail'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div><!-- ===== HISTOIRE-GÉO ===== -->
-<div id="Histoire" class="tabcontent">
-  <div class="category">
-    <h2>🗺️ Histoire-Géo</h2>
-
-    <div class="eval" data-keywords="révolution XIXe guerre mondiale">
-      <h3>📜 Histoire</h3>
-      <ul>
-        <li>Expliquer les causes et conséquences de la Révolution française</li>
-        <li>Identifier les principales étapes du XIXe siècle</li>
-        <li>Comprendre les causes et effets des Guerres mondiales</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Histoire - Révolution','',['Expliquer les causes et conséquences de la Révolution française','Identifier les principales étapes du XIXe siècle','Comprendre les causes et effets des Guerres mondiales'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="carte continents océans métropole">
-      <h3>🌍 Géographie</h3>
-      <ul>
-        <li>Identifier continents et océans sur une carte</li>
-        <li>Expliquer la notion de métropole et d’outre-mer</li>
-        <li>Analyser la répartition de la population dans le monde</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Géographie - Carte','',['Identifier continents et océans sur une carte','Expliquer la notion de métropole et d’outre-mer','Analyser la répartition de la population dans le monde'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===== SVT ===== -->
-<div id="SVT" class="tabcontent">
-  <div class="category">
-    <h2>🧬 SVT</h2>
-
-    <div class="eval" data-keywords="cellule ADN génétique reproduction">
-      <h3>🔬 Biologie</h3>
-      <ul>
-        <li>Nommer les parties de la cellule</li>
-        <li>Expliquer la reproduction sexuée et asexuée</li>
-        <li>Identifier les éléments de l’ADN et leur rôle</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('SVT - Biologie','',['Nommer les parties de la cellule','Expliquer la reproduction sexuée et asexuée','Identifier les éléments de l’ADN et leur rôle'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="écologie environnement chaîne alimentaire">
-      <h3>🌱 Écologie</h3>
-      <ul>
-        <li>Expliquer la notion de chaîne alimentaire</li>
-        <li>Analyser l’impact de l’homme sur l’environnement</li>
-        <li>Identifier les écosystèmes locaux</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('SVT - Écologie','',['Expliquer la notion de chaîne alimentaire','Analyser l’impact de l’homme sur l’environnement','Identifier les écosystèmes locaux'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===== PHYSIQUE-CHIMIE ===== -->
-<div id="Physique" class="tabcontent">
-  <div class="category">
-    <h2>⚛️ Physique-Chimie</h2>
-
-    <div class="eval" data-keywords="énergie lumière électricité">
-      <h3>💡 Energie & circuits</h3>
-      <ul>
-        <li>Décrire le fonctionnement d’un circuit électrique simple</li>
-        <li>Identifier les sources d’énergie renouvelable et non-renouvelable</li>
-        <li>Calculer la consommation énergétique d’un appareil</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Physique - Energie','',['Décrire le fonctionnement d’un circuit électrique simple','Identifier les sources d’énergie renouvelable et non-renouvelable','Calculer la consommation énergétique d’un appareil'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="chimie réactions molécules transformation">
-      <h3>⚗️ Chimie</h3>
-      <ul>
-        <li>Identifier les réactifs et produits d’une réaction chimique</li>
-        <li>Écrire des formules moléculaires simples</li>
-        <li>Observer et décrire une transformation chimique</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Physique - Chimie','',['Identifier les réactifs et produits d’une réaction chimique','Écrire des formules moléculaires simples','Observer et décrire une transformation chimique'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div><!-- ===== TECHNOLOGIE ===== -->
-<div id="Technologie" class="tabcontent">
-  <div class="category">
-    <h2>🛠 Technologie</h2>
-
-    <div class="eval" data-keywords="objet technique énergie fonctionnement">
-      <h3>⚙️ Objets techniques</h3>
-      <ul>
-        <li>Analyser le fonctionnement d’un objet technique</li>
-        <li>Identifier les énergies utilisées</li>
-        <li>Expliquer l’impact environnemental de l’objet</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Technologie - Objet','',['Analyser le fonctionnement d’un objet technique','Identifier les énergies utilisées','Expliquer l’impact environnemental de l’objet'])">Télécharger PDF</button>
-    </div>
-
-    <div class="eval" data-keywords="informatique programmation robotique">
-      <h3>💻 Informatique & robotique</h3>
-      <ul>
-        <li>Écrire un petit programme logique en pseudo-code</li>
-        <li>Analyser le fonctionnement d’un robot simple</li>
-        <li>Identifier les capteurs et actionneurs</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Technologie - Robotique','',['Écrire un petit programme logique en pseudo-code','Analyser le fonctionnement d’un robot simple','Identifier les capteurs et actionneurs'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===== ARTS PLASTIQUES ===== -->
-<div id="Arts" class="tabcontent">
-  <div class="category">
-    <h2>🎨 Arts Plastiques</h2>
-
-    <div class="eval" data-keywords="dessin peinture sculpture créativité">
-      <h3>🖌 Projet créatif</h3>
-      <ul>
-        <li>Réaliser un dessin ou peinture en perspective</li>
-        <li>Analyser les couleurs et textures utilisées</li>
-        <li>Créer une petite sculpture ou objet artistique</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Arts - Projet','',['Réaliser un dessin ou peinture en perspective','Analyser les couleurs et textures utilisées','Créer une petite sculpture ou objet artistique'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===== MUSIQUE ===== -->
-<div id="Musique" class="tabcontent">
-  <div class="category">
-    <h2>🎵 Musique</h2>
-
-    <div class="eval" data-keywords="rythme notes écoute composition">
-      <h3>🎼 Théorie musicale</h3>
-      <ul>
-        <li>Identifier les notes sur la portée</li>
-        <li>Analyser un rythme simple</li>
-        <li>Composer une petite mélodie courte</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('Musique - Théorie','',['Identifier les notes sur la portée','Analyser un rythme simple','Composer une petite mélodie courte'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div>
-
-<!-- ===== EPS ===== -->
-<div id="EPS" class="tabcontent">
-  <div class="category">
-    <h2>🏃 EPS</h2>
-
-    <div class="eval" data-keywords="endurance règles sécurité effort">
-      <h3>💪 Test physique</h3>
-      <ul>
-        <li>Test d’endurance : 6 minutes de course</li>
-        <li>Exercices de coordination et souplesse</li>
-        <li>Questions sur règles de sécurité et échauffement</li>
-      </ul>
-      <button class="pdf" onclick="downloadPDF('EPS - Test','',['Test d’endurance : 6 minutes de course','Exercices de coordination et souplesse','Questions sur règles de sécurité et échauffement'])">Télécharger PDF</button>
-    </div>
-
-  </div>
-</div><script>
-// Fonction pour changer d'onglet
-function openTab(evt, tabName) {
-  var i, tabcontent, tablinks;
-  tabcontent = document.getElementsByClassName("tabcontent");
-  for (i = 0; i < tabcontent.length; i++) {
-    tabcontent[i].style.display = "none";
-  }
-  tablinks = document.getElementsByClassName("tablinks");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].className = tablinks[i].className.replace(" active", "");
-  }
-  document.getElementById(tabName).style.display = "block";
-  evt.currentTarget.className += " active";
+function login() {
+    const username = document.getElementById('username').value.trim();
+    if(!username) { alert("Entrez un pseudo TikTok !"); return; }
+    currentUser = username;
+    if(!leaderboard[currentUser]) leaderboard[currentUser] = {coins:0};
+    document.getElementById('login-card').style.display='none';
+    document.getElementById('mission-card').style.display='block';
+    document.getElementById('profile-name').innerText = `Profil : ${currentUser}`;
+    document.getElementById('coins').innerText = leaderboard[currentUser].coins;
+    renderLeaderboard();
+    generateMission();
 }
 
-// Ouvrir l'onglet par défaut
-document.getElementById("defaultOpen").click();
+function generateMission() {
+    const today = new Date();
+    const dayOfYear = Math.floor((today - new Date(today.getFullYear(), 0, 0))/(1000*60*60*24));
+    const index = dayOfYear % missions.length;
+    document.getElementById('mission').innerText = missions[index];
+}
 
-// Recherche par mot-clé
-document.getElementById("search").addEventListener("input", function() {
-  let filter = this.value.toLowerCase();
-  let evals = document.querySelectorAll(".eval");
-  evals.forEach(e => {
-    let keywords = e.getAttribute("data-keywords");
-    if(keywords.toLowerCase().includes(filter)) {
-      e.style.display = "block";
-    } else {
-      e.style.display = "none";
+function submitVideo() {
+    const link = document.getElementById('tiktok-link').value;
+    if(!link.includes("#missiontodaybro")) {
+        alert("Le lien doit contenir #missiontodaybro pour gagner des coins !");
+        return;
     }
-  });
-});
+    leaderboard[currentUser].coins += 10;
+    localStorage.setItem('leaderboard', JSON.stringify(leaderboard));
+    document.getElementById('coins').innerText = leaderboard[currentUser].coins;
+    renderLeaderboard();
+    alert("Bravo ! Coins ajoutés 🎉");
+    document.getElementById('tiktok-link').value = '';
+}
 
-// Fonction pour générer PDF
-function downloadPDF(title,imgUrl,contentList) {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.setFontSize(16);
-  doc.text(title, 10, 20);
-  let y = 30;
-
-  if(imgUrl && imgUrl !== '') {
-    let img = new Image();
-    img.crossOrigin = "anonymous";
-    img.src = imgUrl;
-    img.onload = function() {
-      doc.addImage(img, 'PNG', 10, y, 180, 90);
-      y += 100;
-      contentList.forEach(line => {
-        doc.text("• " + line, 10, y);
-        y += 10;
-      });
-      doc.save(title + ".pdf");
-    }
-    img.onerror = function() {
-      contentList.forEach(line => {
-        doc.text("• " + line, 10, y);
-        y += 10;
-      });
-      doc.save(title + ".pdf");
-    }
-  } else {
-    contentList.forEach(line => {
-      doc.text("• " + line, 10, y);
-      y += 10;
+function renderLeaderboard() {
+    const tbody = document.getElementById('leaderboard-body');
+    tbody.innerHTML='';
+    const sorted = Object.entries(leaderboard).sort((a,b)=>b[1].coins - a[1].coins);
+    sorted.forEach(([name,data])=>{
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td>${name}</td><td>${data.coins}</td>`;
+        tbody.appendChild(tr);
     });
-    doc.save(title + ".pdf");
-  }
 }
 </script>
 
