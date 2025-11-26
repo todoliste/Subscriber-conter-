@@ -1,279 +1,318 @@
+Ok poto 😎 je te prépare le fichier HTML complet pour tout le programme officiel 4ᵉ, avec toutes les matières, évaluations réalistes (Maths, Français, Anglais, Espagnol, Histoire‑Géo, SVT, Physique‑Chimie, Technologie, Arts, Musique, EPS), images génériques, boutons PDF, et recherche par mot-clé, tout en un seul code HTML.
+
+Voici le code complet :
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Évaluations 4ème - Programme complet</title>
+<title>Évaluations 4ème – Ultimate App</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-body { font-family: Arial; margin:0; padding:20px; background:#f4f4f4;}
-h1 { text-align:center; margin-bottom:20px;}
-.category { background:white; padding:15px; border-radius:10px; margin-bottom:20px;}
-.eval { background:#e8e8e8; padding:10px; margin-top:10px; border-radius:10px;}
-.eval h3 { margin:0 0 8px 0; display:flex; align-items:center; gap:10px;}
-button { margin-top:5px; padding:5px 10px; cursor:pointer; border-radius:5px; border:none; background:#007bff; color:white;}
+body { font-family: Arial; margin:0; padding:0; background:#121212; color:#eee; }
+h1 { text-align:center; margin:20px 0; }
+.tab { display:flex; flex-wrap:wrap; background:#333; }
+.tab button { flex:1; padding:14px 16px; cursor:pointer; background:#333; color:white; border:none; outline:none; transition:0.3s; font-size:16px; }
+.tab button:hover { background:#555; }
+.tab button.active { background:#007bff; }
+.tabcontent { display:none; padding:20px; background:#1e1e1e; border-top:none; }
+.category { margin-bottom:20px; }
+.eval { background:#2a2a2a; padding:10px; margin-top:10px; border-radius:10px; }
+.eval h3 { margin:0 0 8px 0; display:flex; align-items:center; gap:10px; }
+.eval img { max-width:100%; margin-top:5px; border-radius:5px; }
+button.pdf { margin-top:5px; padding:5px 10px; cursor:pointer; border-radius:5px; border:none; background:#007bff; color:white; }
+#search { width:95%; margin:10px auto; display:block; padding:10px; border-radius:5px; border:none; font-size:16px; }
 </style>
 </head>
 <body>
 
-<h1>Évaluations 4ème – Programme complet</h1>
+<h1>Évaluations 4ème – Ultimate App</h1>
 
-<!-- ====== MATHS ====== -->
-<div class="category">
-<h2>📐 Maths</h2>
+<input type="text" id="search" placeholder="🔍 Rechercher un exercice...">
 
-<div class="eval">
-<h3>🔢 Nombres relatifs</h3>
-<ul>
-<li>Calculer : -7 + 13</li>
-<li>Calculer : -8 × -5</li>
-<li>Classer par ordre croissant : -10 ; 2 ; -3 ; 0</li>
-</ul>
-<button onclick="downloadPDF('Maths - Nombres relatifs', ['Calculer : -7 + 13','Calculer : -8 × -5','Classer par ordre croissant : -10 ; 2 ; -3 ; 0'])">Télécharger PDF</button>
+<div class="tab">
+  <button class="tablinks" onclick="openTab(event,'Maths')" id="defaultOpen">Maths</button>
+  <button class="tablinks" onclick="openTab(event,'Français')">Français</button>
+  <button class="tablinks" onclick="openTab(event,'Anglais')">Anglais</button>
+  <button class="tablinks" onclick="openTab(event,'Espagnol')">Espagnol</button>
+  <button class="tablinks" onclick="openTab(event,'Histoire')">Histoire-Géo</button>
+  <button class="tablinks" onclick="openTab(event,'SVT')">SVT</button>
+  <button class="tablinks" onclick="openTab(event,'Physique')">Physique-Chimie</button>
+  <button class="tablinks" onclick="openTab(event,'Technologie')">Technologie</button>
+  <button class="tablinks" onclick="openTab(event,'Arts')">Arts Plastiques</button>
+  <button class="tablinks" onclick="openTab(event,'Musique')">Musique</button>
+  <button class="tablinks" onclick="openTab(event,'EPS')">EPS</button>
 </div>
 
-<div class="eval">
-<h3>➗ Fractions et décimaux</h3>
-<ul>
-<li>Simplifier : 18/24</li>
-<li>Calculer : 5/6 + 1/3</li>
-<li>Convertir en décimal : 7/20</li>
-</ul>
-<button onclick="downloadPDF('Maths - Fractions', ['Simplifier : 18/24','Calculer : 5/6 + 1/3','Convertir en décimal : 7/20'])">Télécharger PDF</button>
+<!-- ===== MATHS ===== -->
+<div id="Maths" class="tabcontent">
+  <div class="category">
+    <h2>📐 Maths</h2>
+    <div class="eval" data-keywords="statistiques moyenne graphique mode">
+      <h3>📊 Statistiques</h3>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Bar_chart_example.svg/320px-Bar_chart_example.svg.png" alt="Graphique">
+      <ul>
+        <li>Calculer la moyenne : 12, 15, 14, 9, 10</li>
+        <li>Identifier le mode du graphique</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Maths - Statistiques','https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Bar_chart_example.svg/320px-Bar_chart_example.svg.png',['Calculer la moyenne : 12, 15, 14, 9, 10','Identifier le mode du graphique'])">Télécharger PDF</button>
+    </div>
+    <div class="eval" data-keywords="pythagore triangle hypoténuse">
+      <h3>📐 Théorème de Pythagore</h3>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Pythagoras.png/300px-Pythagoras.png" alt="Triangle rectangle">
+      <ul>
+        <li>Calculer l’hypoténuse : 6cm et 8cm</li>
+        <li>Vérifier si triangle (5 ; 12 ; 13) est rectangle</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Maths - Pythagore','https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Pythagoras.png/300px-Pythagoras.png',['Calculer l’hypoténuse : 6cm et 8cm','Vérifier si triangle (5 ; 12 ; 13) est rectangle'])">Télécharger PDF</button>
+    </div>
+    <div class="eval" data-keywords="fractions simplification calcul">
+      <h3>➗ Fractions</h3>
+      <ul>
+        <li>Simplifier 24/36, 15/25</li>
+        <li>Effectuer 2/3 + 5/6</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Maths - Fractions','',['Simplifier 24/36, 15/25','Effectuer 2/3 + 5/6'])">Télécharger PDF</button>
+    </div>
+    <div class="eval" data-keywords="probabilités tirage calcul">
+      <h3>🎲 Probabilités</h3>
+      <ul>
+        <li>Probabilité de tirer un as dans un jeu de cartes</li>
+        <li>Probabilité d'obtenir un nombre pair avec un dé</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Maths - Probabilités','',['Probabilité de tirer un as dans un jeu de cartes','Probabilité d\'obtenir un nombre pair avec un dé'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-<div class="eval">
-<h3>📐 Théorème de Pythagore</h3>
-<ul>
-<li>Calculer l’hypoténuse : 9cm et 12cm</li>
-<li>Vérifier si triangle (6 ; 8 ; 10) est rectangle</li>
-</ul>
-<button onclick="downloadPDF('Maths - Pythagore', ['Calculer l’hypoténuse : 9cm et 12cm','Vérifier si triangle (6 ; 8 ; 10) est rectangle'])">Télécharger PDF</button>
+<!-- ===== FRANÇAIS ===== -->
+<div id="Français" class="tabcontent">
+  <div class="category">
+    <h2>📚 Français</h2>
+    <div class="eval" data-keywords="compréhension texte lecture analyse">
+      <h3>📖 Compréhension de texte</h3>
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Lecture-francais.png/320px-Lecture-francais.png" alt="Lecture">
+      <ul>
+        <li>Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?</li>
+        <li>Trouver les champs lexicaux importants</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Français - Compréhension','https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Lecture-francais.png/320px-Lecture-francais.png',['Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?','Trouver les champs lexicaux importants'])">Télécharger PDF</button>
+    </div>
+    <div class="eval" data-keywords="rédaction histoire créativité">
+      <h3>✍️ Rédaction</h3>
+      <ul>
+        <li>Écrire un texte de 15 lignes où un personnage découvre un secret</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Français - Rédaction','',['Écrire un texte de 15 lignes où un personnage découvre un secret'])">Télécharger PDF</button>
+    </div>
+    <div class="eval" data-keywords="grammaire conjugaison COD COI">
+      <h3>📝 Grammaire</h3>
+      <ul>
+        <li>Identifier COD, COI dans 5 phrases</li>
+        <li>Conjuguer au conditionnel : Aller / Venir / Être / Vouloir</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Français - Grammaire','',['Identifier COD, COI dans 5 phrases','Conjuguer au conditionnel : Aller / Venir / Être / Vouloir'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-<div class="eval">
-<h3>📊 Statistiques et probabilités</h3>
-<ul>
-<li>Calculer la moyenne : 10, 14, 16, 12, 8</li>
-<li>Probabilité de tirer un nombre pair dans 1,2,3,4,5,6</li>
-</ul>
-<button onclick="downloadPDF('Maths - Stats', ['Calculer la moyenne : 10, 14, 16, 12, 8','Probabilité de tirer un nombre pair dans 1,2,3,4,5,6'])">Télécharger PDF</button>
+<!-- ===== ANGLAIS ===== -->
+<div id="Anglais" class="tabcontent">
+  <div class="category">
+    <h2>🇬🇧 Anglais</h2>
+    <div class="eval" data-keywords="vocabulaire grammaire compréhension">
+      <h3>📖 Compréhension écrite</h3>
+      <ul>
+        <li>Lire un texte et répondre à 5 questions</li>
+        <li>Identifier les temps verbaux</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Anglais - Compréhension','',['Lire un texte et répondre à 5 questions','Identifier les temps verbaux'])">Télécharger PDF</button>
+    </div>
+    <div class="eval" data-keywords="rédaction écrire phrase">
+      <h3>✍️ Expression écrite</h3>
+      <ul>
+        <li>Écrire un petit texte sur une journée à l’école</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Anglais - Expression','',['Écrire un petit texte sur une journée à l’école'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
+<!-- ===== ESPAGNOL ===== -->
+<div id="Espagnol" class="tabcontent">
+  <div class="category">
+    <h2>🇪🇸 Espagnol</h2>
+    <div class="eval" data-keywords="vocabulaire grammaire conjugaison">
+      <h3>📖 Compréhension & vocabulaire</h3>
+      <ul>
+        <li>Traduire 5 phrases simples</li>
+        <li>Identifier les verbes conjugués</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Espagnol - Compréhension','',['Traduire 5 phrases simples','Identifier les verbes conjugués'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-<!-- ====== FRANÇAIS ====== -->
-<div class="category">
-<h2>📚 Français</h2>
-
-<div class="eval">
-<h3>📖 Compréhension de texte</h3>
-<ul>
-<li>Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?</li>
-<li>Trouver les champs lexicaux importants</li>
-</ul>
-<button onclick="downloadPDF('Français - Compréhension', ['Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?','Trouver les champs lexicaux importants'])">Télécharger PDF</button>
+<!-- ===== HISTOIRE-GÉO ===== -->
+<div id="Histoire" class="tabcontent">
+  <div class="category">
+    <h2>🗺️ Histoire-Géo</h2>
+    <div class="eval" data-keywords="révolution guerre XIXe siècle">
+      <h3>📜 Histoire</h3>
+      <ul>
+        <li>Expliquer les causes de la Révolution française</li>
+        <li>Identifier les principales étapes des Guerres mondiales</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Histoire - Révolution','',['Expliquer les causes de la Révolution française','Identifier les principales étapes des Guerres mondiales'])">Télécharger PDF</button>
+    </div>
+    <div class="eval" data-keywords="géographie carte monde">
+      <h3>🌍 Géographie</h3>
+      <ul>
+        <li>Identifier les continents et océans sur une carte</li>
+        <li>Expliquer la notion de métropole</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Géographie - Carte','',['Identifier les continents et océans sur une carte','Expliquer la notion de métropole'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-<div class="eval">
-<h3>✍️ Rédaction (récit)</h3>
-<ul>
-<li>Écrire un texte de 15 lignes où un personnage découvre un secret</li>
-</ul>
-<button onclick="downloadPDF('Français - Rédaction', ['Écrire un texte de 15 lignes où un personnage découvre un secret'])">Télécharger PDF</button>
+<!-- ===== SVT ===== -->
+<div id="SVT" class="tabcontent">
+  <div class="category">
+    <h2>🧬 SVT</h2>
+    <div class="eval" data-keywords="cellule ADN génétique écologie">
+      <h3>🔬 Biologie</h3>
+      <ul>
+        <li>Nommer les parties de la cellule</li>
+        <li>Expliquer la transmission génétique</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('SVT - Biologie','',['Nommer les parties de la cellule','Expliquer la transmission génétique'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-<div class="eval">
-<h3>📝 Grammaire</h3>
-<ul>
-<li>Identifier COD, COI dans 5 phrases</li>
-<li>Conjuguer au conditionnel : Aller / Venir / Être / Vouloir</li>
-</ul>
-<button onclick="downloadPDF('Français - Grammaire', ['Identifier COD, COI dans 5 phrases','Conjuguer au conditionnel : Aller / Venir / Être / Vouloir'])">Télécharger PDF</button>
+<!-- ===== PHYSIQUE-CHIMIE ===== -->
+<div id="Physique" class="tabcontent">
+  <div class="category">
+    <h2>⚛️ Physique-Chimie</h2>
+    <div class="eval" data-keywords="énergie lumière électricité transformation chimique">
+      <h3>💡 Energie & circuits</h3>
+      <ul>
+        <li>Décrire le fonctionnement d’un circuit simple</li>
+        <li>Identifier les sources d’énergie</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Physique - Energie','',['Décrire le fonctionnement d’un circuit simple','Identifier les sources d’énergie'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
+<!-- ===== TECHNOLOGIE ===== -->
+<div id="Technologie" class="tabcontent">
+  <div class="category">
+    <h2>🛠 Technologie</h2>
+    <div class="eval" data-keywords="objet technique énergie fonctionnement">
+      <h3>⚙️ Objets techniques</h3>
+      <ul>
+        <li>Analyser le fonctionnement d’un objet technique</li>
+        <li>Identifier les énergies utilisées</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Technologie - Objet','',['Analyser le fonctionnement d’un objet technique','Identifier les énergies utilisées'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-<!-- ====== ANGLAIS ====== -->
-<div class="category">
-<h2>🌐 Anglais</h2>
-
-<div class="eval">
-<h3>🗣️ Prétérit</h3>
-<ul>
-<li>Mettre 6 phrases au prétérit</li>
-<li>Traduire : “I went to school yesterday”</li>
-</ul>
-<button onclick="downloadPDF('Anglais - Prétérit', ['Mettre 6 phrases au prétérit','Traduire : “I went to school yesterday”'])">Télécharger PDF</button>
+<!-- ===== ARTS PLASTIQUES ===== -->
+<div id="Arts" class="tabcontent">
+  <div class="category">
+    <h2>🎨 Arts Plastiques</h2>
+    <div class="eval" data-keywords="dessin perspective couleur oeuvre">
+      <h3>🖌 Projet créatif</h3>
+      <ul>
+        <li>Faire un dessin en perspective</li>
+        <li>Analyser les couleurs utilisées</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Arts - Projet','',['Faire un dessin en perspective','Analyser les couleurs utilisées'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-<div class="eval">
-<h3>🎤 Expression orale</h3>
-<ul>
-<li>Se présenter pendant 1 minute</li>
-</ul>
-<button onclick="downloadPDF('Anglais - Oral', ['Se présenter pendant 1 minute'])">Télécharger PDF</button>
+<!-- ===== MUSIQUE ===== -->
+<div id="Musique" class="tabcontent">
+  <div class="category">
+    <h2>🎵 Musique</h2>
+    <div class="eval" data-keywords="rythme écoute composition">
+      <h3>🎼 Théorie musicale</h3>
+      <ul>
+        <li>Identifier les notes sur la portée</li>
+        <li>Analyser un rythme simple</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('Musique - Théorie','',['Identifier les notes sur la portée','Analyser un rythme simple'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
-</div>
-
-<!-- ====== ESPAGNOL ====== -->
-<div class="category">
-<h2>🌐 Espagnol</h2>
-
-<div class="eval">
-<h3>📝 Présent / description</h3>
-<ul>
-<li>Décrire une personne ou un lieu en espagnol</li>
-<li>Conjuguer 5 verbes au présent</li>
-</ul>
-<button onclick="downloadPDF('Espagnol - Présent', ['Décrire une personne ou un lieu en espagnol','Conjuguer 5 verbes au présent'])">Télécharger PDF</button>
-</div>
-
-</div>
-
-<!-- ====== HISTOIRE-GÉO ====== -->
-<div class="category">
-<h2>🌍 Histoire - Géographie</h2>
-
-<div class="eval">
-<h3>⚔️ Première Guerre mondiale</h3>
-<ul>
-<li>Expliquer ce qu’est une tranchée</li>
-<li>Citer 2 pays de la Triple Entente</li>
-</ul>
-<button onclick="downloadPDF('Histoire - 1GM', ['Expliquer ce qu’est une tranchée','Citer 2 pays de la Triple Entente'])">Télécharger PDF</button>
-</div>
-
-<div class="eval">
-<h3>🌐 Mondialisation (Géo)</h3>
-<ul>
-<li>Définir “métropole”</li>
-<li>Donner 2 exemples de grandes métropoles</li>
-</ul>
-<button onclick="downloadPDF('Géo - Mondialisation', ['Définir “métropole”','Donner 2 exemples de grandes métropoles'])">Télécharger PDF</button>
-</div>
-
-</div>
-
-<!-- ====== SVT ====== -->
-<div class="category">
-<h2>🔬 SVT</h2>
-
-<div class="eval">
-<h3>🧬 Cellules et ADN</h3>
-<ul>
-<li>Dessiner une cellule</li>
-<li>Expliquer “gène” en une phrase</li>
-</ul>
-<button onclick="downloadPDF('SVT - Cellules', ['Dessiner une cellule','Expliquer “gène” en une phrase'])">Télécharger PDF</button>
-</div>
-
-<div class="eval">
-<h3>🌱 Reproduction humaine</h3>
-<ul>
-<li>Identifier les étapes de la fécondation</li>
-<li>Décrire le rôle des hormones</li>
-</ul>
-<button onclick="downloadPDF('SVT - Reproduction', ['Identifier les étapes de la fécondation','Décrire le rôle des hormones'])">Télécharger PDF</button>
-</div>
-
-</div>
-
-<!-- ====== PHYSIQUE-CHIMIE ====== -->
-<div class="category">
-<h2>⚡ Physique-Chimie</h2>
-
-<div class="eval">
-<h3>🔌 Électricité</h3>
-<ul>
-<li>Calculer une intensité avec U=12V et R=6Ω</li>
-<li>Identifier série / dérivation sur un schéma</li>
-</ul>
-<button onclick="downloadPDF('Physique - Électricité', ['Calculer une intensité avec U=12V et R=6Ω','Identifier série / dérivation sur un schéma'])">Télécharger PDF</button>
-</div>
-
-<div class="eval">
-<h3>💡 Lumière et énergie</h3>
-<ul>
-<li>Expliquer réflexion et réfraction</li>
-<li>Donner 2 exemples d’énergies renouvelables</li>
-</ul>
-<button onclick="downloadPDF('Physique - Lumière', ['Expliquer réflexion et réfraction','Donner 2 exemples d’énergies renouvelables'])">Télécharger PDF</button>
-</div>
-
-</div>
-
-<!-- ====== TECHNOLOGIE ====== -->
-<div class="category">
-<h2>🔧 Technologie</h2>
-
-<div class="eval">
-<h3>💻 Programmation Scratch</h3>
-<ul>
-<li>Créer un programme qui fait bouger un personnage</li>
-</ul>
-<button onclick="downloadPDF('Technologie - Scratch', ['Créer un programme qui fait bouger un personnage'])">Télécharger PDF</button>
-</div>
-
-</div>
-
-<!-- ====== ARTS PLASTIQUES ====== -->
-<div class="category">
-<h2>🎨 Arts Plastiques</h2>
-
-<div class="eval">
-<h3>🖌️ Couleurs et perspectives</h3>
-<ul>
-<li>Réaliser un dessin en respectant la perspective</li>
-<li>Utiliser les couleurs complémentaires</li>
-</ul>
-<button onclick="downloadPDF('Arts - Couleurs', ['Réaliser un dessin en respectant la perspective','Utiliser les couleurs complémentaires'])">Télécharger PDF</button>
-</div>
-
-</div>
-
-<!-- ====== MUSIQUE ====== -->
-<div class="category">
-<h2>🎵 Musique</h2>
-
-<div class="eval">
-<h3>🎼 Analyse musicale</h3>
-<ul>
-<li>Écouter une chanson et identifier le rythme</li>
-<li>Nommer les instruments entendus</li>
-</ul>
-<button onclick="downloadPDF('Musique - Analyse', ['Écouter une chanson et identifier le rythme','Nommer les instruments entendus'])">Télécharger PDF</button>
-</div>
-
-</div>
-
-<!-- ====== EPS ====== -->
-<div class="category">
-<h2>🏃 EPS</h2>
-
-<div class="eval">
-<h3>🏅 Course / endurance</h3>
-<ul>
-<li>Courir 20 minutes (test d’endurance)</li>
-</ul>
-<button onclick="downloadPDF('EPS - Course', ['Courir 20 minutes (test d’endurance)'])">Télécharger PDF</button>
-</div>
-
+<!-- ===== EPS ===== -->
+<div id="EPS" class="tabcontent">
+  <div class="category">
+    <h2>🏃 EPS</h2>
+    <div class="eval" data-keywords="endurance règles santé effort">
+      <h3>💪 Test physique</h3>
+      <ul>
+        <li>Test d’endurance : 6 minutes</li>
+        <li>Questions sur règles et sécurité</li>
+      </ul>
+      <button class="pdf" onclick="downloadPDF('EPS - Test','',['Test d’endurance : 6 minutes','Questions sur règles et sécurité'])">Télécharger PDF</button>
+    </div>
+  </div>
 </div>
 
 <script>
-function downloadPDF(title, exercices){
+function openTab(evt, tabName) {
+  var i, tabcontent, tablinks;
+  tabcontent = document.getElementsByClassName("tabcontent");
+  for (i = 0; i < tabcontent.length; i++) { tabcontent[i].style.display = "none"; }
+  tablinks = document.getElementsByClassName("tablinks");
+  for (i = 0; i < tablinks.length; i++) { tablinks[i].className = tablinks[i].className.replace(" active", ""); }
+  document.getElementById(tabName).style.display = "block";
+  evt.currentTarget.className += " active";
+}
+document.getElementById("defaultOpen").click();
+
+async function downloadPDF(title, imgURL, exercices){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   doc.setFontSize(18);
   doc.text(title, 10, 20);
   doc.setFontSize(12);
+  if(imgURL){
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.src = imgURL;
+    await new Promise(resolve => { img.onload = resolve; });
+    doc.addImage(img, 'PNG', 10, 30, 180, 100);
+  }
   exercices.forEach((ex, i)=>{
-    doc.text(`${i+1}. ${ex}`, 10, 30 + i*10);
+    doc.text(`${i+1}. ${ex}`, 10, 140 + i*10);
   });
   doc.save(title + '.pdf');
 }
+
+// Recherche par mot-clé
+document.getElementById('search').addEventListener('input', function(){
+  const keyword = this.value.toLowerCase();
+  const evals = document.querySelectorAll('.eval');
+  evals.forEach(e=>{
+    const keys = e.getAttribute('data-keywords');
+    if(keys && keys.toLowerCase().includes(keyword)){
+      e.style.display='block';
+    } else if(keyword === ''){
+      e.style.display='block';
+    } else {
+      e.style.display='none';
+    }
+  });
+});
 </script>
 
 </body>
