@@ -3,226 +3,278 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Calc + Notes + Dictionnaire 4ème</title>
+<title>Évaluations 4ème - Programme complet</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
-body{margin:0;font-family:Arial;background:#111;color:white;}
-#calc{max-width:400px;margin:20px auto;padding:15px;background:#222;border-radius:10px;}
-#screen{width:100%;height:60px;font-size:26px;text-align:right;padding:10px;border:none;border-radius:6px;background:#000;color:#0f0;}
-.button-row{display:flex;flex-wrap:wrap;justify-content:space-between;}
-button{flex:1 1 22%;margin:5px 1%;height:60px;font-size:22px;background:#333;color:white;border:none;border-radius:8px;}
-#secretOverlay{
-  display:none;
-  position:fixed;
-  top:0;left:0;
-  width:100%;height:100%;
-  background:rgba(0,0,0,0.95);
-  z-index:1000;
-  overflow-y:auto;
-  padding:20px;
-}
-#close-secret{position:sticky;top:0;background:#f00;color:#fff;border:none;border-radius:6px;padding:10px 15px;margin-bottom:15px;font-size:18px;width:100%;}
-#overlay-content{display:flex;flex-direction:column;gap:20px;}
-.matiere{background:#222;padding:10px;border-radius:8px;}
-.matiere h2{margin:0 0 10px 0;color:#0f0;}
-.note{margin:3px 0;padding:5px;background:#333;border-radius:6px;}
-.dict-entry{margin:5px 0;padding:8px;background:#222;border-radius:6px;}
-.dict-word{font-weight:bold;color:#0f0;}
+body { font-family: Arial; margin:0; padding:20px; background:#f4f4f4;}
+h1 { text-align:center; margin-bottom:20px;}
+.category { background:white; padding:15px; border-radius:10px; margin-bottom:20px;}
+.eval { background:#e8e8e8; padding:10px; margin-top:10px; border-radius:10px;}
+.eval h3 { margin:0 0 8px 0; display:flex; align-items:center; gap:10px;}
+button { margin-top:5px; padding:5px 10px; cursor:pointer; border-radius:5px; border:none; background:#007bff; color:white;}
 </style>
 </head>
 <body>
 
-<div id="calc">
-  <input type="text" id="screen" disabled>
-  <div class="button-row">
-    <button onclick="press('7')">7</button>
-    <button onclick="press('8')">8</button>
-    <button onclick="press('9')">9</button>
-    <button onclick="press('/')">/</button>
-    <button onclick="press('4')">4</button>
-    <button onclick="press('5')">5</button>
-    <button onclick="press('6')">6</button>
-    <button onclick="press('*')">*</button>
-    <button onclick="press('1')">1</button>
-    <button onclick="press('2')">2</button>
-    <button onclick="press('3')">3</button>
-    <button onclick="press('-')">-</button>
-    <button onclick="press('0')">0</button>
-    <button onclick="press('.')">.</button>
-    <button onclick="equal()">=</button>
-    <button onclick="press('+')">+</button>
-    <button style="flex:1 1 100%" onclick="clearCalc()">C</button>
-  </div>
+<h1>Évaluations 4ème – Programme complet</h1>
+
+<!-- ====== MATHS ====== -->
+<div class="category">
+<h2>📐 Maths</h2>
+
+<div class="eval">
+<h3>🔢 Nombres relatifs</h3>
+<ul>
+<li>Calculer : -7 + 13</li>
+<li>Calculer : -8 × -5</li>
+<li>Classer par ordre croissant : -10 ; 2 ; -3 ; 0</li>
+</ul>
+<button onclick="downloadPDF('Maths - Nombres relatifs', ['Calculer : -7 + 13','Calculer : -8 × -5','Classer par ordre croissant : -10 ; 2 ; -3 ; 0'])">Télécharger PDF</button>
 </div>
 
-<div id="secretOverlay">
-  <button id="close-secret" onclick="closeSecret()">Fermer</button>
-  <div id="overlay-content"></div>
+<div class="eval">
+<h3>➗ Fractions et décimaux</h3>
+<ul>
+<li>Simplifier : 18/24</li>
+<li>Calculer : 5/6 + 1/3</li>
+<li>Convertir en décimal : 7/20</li>
+</ul>
+<button onclick="downloadPDF('Maths - Fractions', ['Simplifier : 18/24','Calculer : 5/6 + 1/3','Convertir en décimal : 7/20'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>📐 Théorème de Pythagore</h3>
+<ul>
+<li>Calculer l’hypoténuse : 9cm et 12cm</li>
+<li>Vérifier si triangle (6 ; 8 ; 10) est rectangle</li>
+</ul>
+<button onclick="downloadPDF('Maths - Pythagore', ['Calculer l’hypoténuse : 9cm et 12cm','Vérifier si triangle (6 ; 8 ; 10) est rectangle'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>📊 Statistiques et probabilités</h3>
+<ul>
+<li>Calculer la moyenne : 10, 14, 16, 12, 8</li>
+<li>Probabilité de tirer un nombre pair dans 1,2,3,4,5,6</li>
+</ul>
+<button onclick="downloadPDF('Maths - Stats', ['Calculer la moyenne : 10, 14, 16, 12, 8','Probabilité de tirer un nombre pair dans 1,2,3,4,5,6'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== FRANÇAIS ====== -->
+<div class="category">
+<h2>📚 Français</h2>
+
+<div class="eval">
+<h3>📖 Compréhension de texte</h3>
+<ul>
+<li>Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?</li>
+<li>Trouver les champs lexicaux importants</li>
+</ul>
+<button onclick="downloadPDF('Français - Compréhension', ['Lire un texte et répondre : Qui ? Où ? Quand ? Pourquoi ?','Trouver les champs lexicaux importants'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>✍️ Rédaction (récit)</h3>
+<ul>
+<li>Écrire un texte de 15 lignes où un personnage découvre un secret</li>
+</ul>
+<button onclick="downloadPDF('Français - Rédaction', ['Écrire un texte de 15 lignes où un personnage découvre un secret'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>📝 Grammaire</h3>
+<ul>
+<li>Identifier COD, COI dans 5 phrases</li>
+<li>Conjuguer au conditionnel : Aller / Venir / Être / Vouloir</li>
+</ul>
+<button onclick="downloadPDF('Français - Grammaire', ['Identifier COD, COI dans 5 phrases','Conjuguer au conditionnel : Aller / Venir / Être / Vouloir'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== ANGLAIS ====== -->
+<div class="category">
+<h2>🌐 Anglais</h2>
+
+<div class="eval">
+<h3>🗣️ Prétérit</h3>
+<ul>
+<li>Mettre 6 phrases au prétérit</li>
+<li>Traduire : “I went to school yesterday”</li>
+</ul>
+<button onclick="downloadPDF('Anglais - Prétérit', ['Mettre 6 phrases au prétérit','Traduire : “I went to school yesterday”'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>🎤 Expression orale</h3>
+<ul>
+<li>Se présenter pendant 1 minute</li>
+</ul>
+<button onclick="downloadPDF('Anglais - Oral', ['Se présenter pendant 1 minute'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== ESPAGNOL ====== -->
+<div class="category">
+<h2>🌐 Espagnol</h2>
+
+<div class="eval">
+<h3>📝 Présent / description</h3>
+<ul>
+<li>Décrire une personne ou un lieu en espagnol</li>
+<li>Conjuguer 5 verbes au présent</li>
+</ul>
+<button onclick="downloadPDF('Espagnol - Présent', ['Décrire une personne ou un lieu en espagnol','Conjuguer 5 verbes au présent'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== HISTOIRE-GÉO ====== -->
+<div class="category">
+<h2>🌍 Histoire - Géographie</h2>
+
+<div class="eval">
+<h3>⚔️ Première Guerre mondiale</h3>
+<ul>
+<li>Expliquer ce qu’est une tranchée</li>
+<li>Citer 2 pays de la Triple Entente</li>
+</ul>
+<button onclick="downloadPDF('Histoire - 1GM', ['Expliquer ce qu’est une tranchée','Citer 2 pays de la Triple Entente'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>🌐 Mondialisation (Géo)</h3>
+<ul>
+<li>Définir “métropole”</li>
+<li>Donner 2 exemples de grandes métropoles</li>
+</ul>
+<button onclick="downloadPDF('Géo - Mondialisation', ['Définir “métropole”','Donner 2 exemples de grandes métropoles'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== SVT ====== -->
+<div class="category">
+<h2>🔬 SVT</h2>
+
+<div class="eval">
+<h3>🧬 Cellules et ADN</h3>
+<ul>
+<li>Dessiner une cellule</li>
+<li>Expliquer “gène” en une phrase</li>
+</ul>
+<button onclick="downloadPDF('SVT - Cellules', ['Dessiner une cellule','Expliquer “gène” en une phrase'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>🌱 Reproduction humaine</h3>
+<ul>
+<li>Identifier les étapes de la fécondation</li>
+<li>Décrire le rôle des hormones</li>
+</ul>
+<button onclick="downloadPDF('SVT - Reproduction', ['Identifier les étapes de la fécondation','Décrire le rôle des hormones'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== PHYSIQUE-CHIMIE ====== -->
+<div class="category">
+<h2>⚡ Physique-Chimie</h2>
+
+<div class="eval">
+<h3>🔌 Électricité</h3>
+<ul>
+<li>Calculer une intensité avec U=12V et R=6Ω</li>
+<li>Identifier série / dérivation sur un schéma</li>
+</ul>
+<button onclick="downloadPDF('Physique - Électricité', ['Calculer une intensité avec U=12V et R=6Ω','Identifier série / dérivation sur un schéma'])">Télécharger PDF</button>
+</div>
+
+<div class="eval">
+<h3>💡 Lumière et énergie</h3>
+<ul>
+<li>Expliquer réflexion et réfraction</li>
+<li>Donner 2 exemples d’énergies renouvelables</li>
+</ul>
+<button onclick="downloadPDF('Physique - Lumière', ['Expliquer réflexion et réfraction','Donner 2 exemples d’énergies renouvelables'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== TECHNOLOGIE ====== -->
+<div class="category">
+<h2>🔧 Technologie</h2>
+
+<div class="eval">
+<h3>💻 Programmation Scratch</h3>
+<ul>
+<li>Créer un programme qui fait bouger un personnage</li>
+</ul>
+<button onclick="downloadPDF('Technologie - Scratch', ['Créer un programme qui fait bouger un personnage'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== ARTS PLASTIQUES ====== -->
+<div class="category">
+<h2>🎨 Arts Plastiques</h2>
+
+<div class="eval">
+<h3>🖌️ Couleurs et perspectives</h3>
+<ul>
+<li>Réaliser un dessin en respectant la perspective</li>
+<li>Utiliser les couleurs complémentaires</li>
+</ul>
+<button onclick="downloadPDF('Arts - Couleurs', ['Réaliser un dessin en respectant la perspective','Utiliser les couleurs complémentaires'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== MUSIQUE ====== -->
+<div class="category">
+<h2>🎵 Musique</h2>
+
+<div class="eval">
+<h3>🎼 Analyse musicale</h3>
+<ul>
+<li>Écouter une chanson et identifier le rythme</li>
+<li>Nommer les instruments entendus</li>
+</ul>
+<button onclick="downloadPDF('Musique - Analyse', ['Écouter une chanson et identifier le rythme','Nommer les instruments entendus'])">Télécharger PDF</button>
+</div>
+
+</div>
+
+<!-- ====== EPS ====== -->
+<div class="category">
+<h2>🏃 EPS</h2>
+
+<div class="eval">
+<h3>🏅 Course / endurance</h3>
+<ul>
+<li>Courir 20 minutes (test d’endurance)</li>
+</ul>
+<button onclick="downloadPDF('EPS - Course', ['Courir 20 minutes (test d’endurance)'])">Télécharger PDF</button>
+</div>
+
 </div>
 
 <script>
-// --- CALCULATRICE ---
-let screen = document.getElementById('screen');
-let eqClickCount = 0;
-function press(val){ screen.value += val; }
-function clearCalc(){ screen.value = ''; eqClickCount=0; }
-function equal(){
-  try{ screen.value = eval(screen.value); } 
-  catch{ screen.value="Erreur"; }
-  eqClickCount++;
-  if(eqClickCount === 4){ openSecret(); eqClickCount=0; }
-}
-
-// --- MODE SECRET ---
-let secretDiv = document.getElementById('secretOverlay');
-function openSecret(){ secretDiv.style.display='block'; loadOverlay(); }
-function closeSecret(){ secretDiv.style.display='none'; }
-
-// --- NOTES 4ème PAR MATIÈRE ---
-const notes = {
-  "Maths":["Formules d'aires","Théorème de Pythagore","Équations du 2nd degré","Fonctions affines et linéaires","Statistiques et probabilités","Volumes des solides"],
-  "Français":["Figures de style","Conjugaison","Accords du participe passé","Types de phrases","Orthographe et vocabulaire"],
-  "Histoire":["Révolution française 1789","1ère Guerre mondiale","2nde Guerre mondiale","Guerre froide","Histoire de la République"],
-  "SVT":["Cellule et ADN","Reproduction humaine et animale","Photosynthèse","Écosystèmes","Système digestif et circulatoire"],
-  "Anglais":["Présent simple","Past simple","Faux-amis","Vocabulaire quotidien","Questions et réponses"]
-};// --- DICTIONNAIRE 500 MOTS ---
-const dict500 = [
-{word:"abaisser",definition:"Rendre plus bas."},
-{word:"abandon",definition:"Action de laisser quelque chose ou quelqu’un."},
-{word:"abattre",definition:"Faire tomber ou tuer."},
-{word:"abcès",definition:"Accumulation de pus."},
-{word:"abeille",definition:"Insecte qui produit du miel."},
-{word:"abolir",definition:"Supprimer une loi ou règle."},
-{word:"aborder",definition:"Commencer à traiter un sujet."},
-{word:"aboutir",definition:"Arriver à un résultat."},
-{word:"abréger",definition:"Raccourcir dans le temps."},
-{word:"abri",definition:"Endroit qui protège."},
-{word:"abriter",definition:"Mettre à l’abri."},
-{word:"absorber",definition:"Prendre ou retenir à l’intérieur."},
-{word:"abuser",definition:"Employer de manière excessive."},
-{word:"accélérer",definition:"Augmenter la vitesse."},
-{word:"accent",definition:"Marque sur une lettre ou prononciation."},
-{word:"accepter",definition:"Recevoir volontiers."},
-{word:"accident",definition:"Événement imprévu et dommageable."},
-{word:"accompagner",definition:"Aller avec quelqu’un."},
-{word:"accord",definition:"Entente ou harmonie."},
-{word:"accorder",definition:"Donner ou permettre."},
-{word:"accrocher",definition:"Attacher ou suspendre."},
-{word:"accueillir",definition:"Recevoir quelqu’un."},
-{word:"acheter",definition:"Acquérir en payant."},
-{word:"acteur",definition:"Personne jouant un rôle."},
-{word:"actif",definition:"Qui agit ou participe."},
-{word:"action",definition:"Ce que l’on fait."},
-{word:"adapter",definition:"Rendre convenable."},
-{word:"addition",definition:"Somme de nombres."},
-{word:"adresse",definition:"Lieu où l’on habite."},
-{word:"adresser",definition:"Envoyer ou parler à quelqu’un."},
-{word:"advenir",definition:"Arriver, se produire."},
-{word:"affaire",definition:"Occupation ou commerce."},
-{word:"affecter",definition:"Influencer ou toucher."},
-{word:"affirmer",definition:"Déclarer avec certitude."},
-{word:"affronter",definition:"Faire face à un obstacle."},
-{word:"âge",definition:"Nombre d’années vécues."},
-{word:"agiter",definition:"Bouger rapidement."},
-{word:"agir",definition:"Faire quelque chose."},
-{word:"agriculture",definition:"Culture des plantes et élevage."},
-{word:"aide",definition:"Assistance."},
-{word:"aimer",definition:"Ressentir de l’affection."},
-{word:"ajouter",definition:"Mettre en plus."},
-{word:"alerter",definition:"Prévenir d’un danger."},
-{word:"aller",definition:"Se déplacer vers."},
-{word:"allumer",definition:"Mettre en marche ou en feu."},
-{word:"amener",definition:"Conduire quelqu’un."},
-{word:"amour",definition:"Sentiment fort pour quelqu’un."},
-{word:"analyser",definition:"Examiner en détail."},
-{word:"ancien",definition:"Qui est d’un temps passé."},
-{word:"angle",definition:"Espace entre deux lignes."},
-{word:"animal",definition:"Être vivant non humain."},
-{word:"année",definition:"Durée de 12 mois."},
-{word:"annoncer",definition:"Faire savoir."},
-{word:"apaiser",definition:"Calmer."},
-{word:"apercevoir",definition:"Voir rapidement."},
-{word:"apprendre",definition:"Acquérir un savoir."},
-{word:"approcher",definition:"Se rapprocher."},
-{word:"appuyer",definition:"Presser ou soutenir."},
-{word:"après",definition:"Ensuite, plus tard."},
-{word:"appareil",definition:"Objet technique ou machine."},
-{word:"appliquer",definition:"Mettre en pratique."},
-{word:"apporter",definition:"Amener quelque chose."},
-{word:"approuver",definition:"Accepter ou confirmer."},
-{word:"arbre",definition:"Plante ligneuse avec tronc."},
-{word:"archiver",definition:"Mettre dans un dossier pour garder."},
-{word:"argent",definition:"Moyen de paiement."},
-{word:"armoire",definition:"Meuble de rangement."},
-{word:"arracher",definition:"Enlever avec force."},
-{word:"arrêter",definition:"Cesser ou stopper."},
-{word:"arriver",definition:"Parvenir à un lieu."},
-{word:"art",definition:"Création esthétique."},
-{word:"article",definition:"Écrit dans un journal ou loi."},
-{word:"aspect",definition:"Apparence ou côté."},
-{word:"assister",definition:"Être présent ou aider."},
-{word:"associer",definition:"Mettre ensemble."},
-{word:"assumer",definition:"Prendre la responsabilité."},
-{word:"attacher",definition:"Fixer ou lier."},
-{word:"atteindre",definition:"Parvenir à."},
-{word:"attendre",definition:"Rester jusqu’à un moment."},
-{word:"attention",definition:"Concentration."},
-{word:"attirer",definition:"Faire venir à soi."},
-{word:"attraper",definition:"Saisir."},
-{word:"aujourd'hui",definition:"Jour présent."},
-{word:"aucun",definition:"Pas un seul."},
-{word:"augmenter",definition:"Rendre plus grand."},
-{word:"auteur",definition:"Personne qui écrit."},
-{word:"autoriser",definition:"Permettre."},
-{word:"automobile",definition:"Véhicule à moteur."},
-{word:"autre",definition:"Différent de celui-ci."},
-{word:"avancer",definition:"Aller en avant."},
-{word:"avant",definition:"Précédent ou devant."},
-{word:"avenir",definition:"Temps futur."},
-{word:"avenir",definition:"Choses qui vont se passer."},
-{word:"avertir",definition:"Informer d’un danger."},
-{word:"avoir",definition:"Posséder ou être obligé de."},
-{word:"avouer",definition:"Reconnaître."},
-{word:"axe",definition:"Ligne autour de laquelle on tourne."},
-{word:"azur",definition:"Couleur bleu du ciel."}
-];// --- AFFICHAGE NOTES + DICTIONNAIRE ---
-function loadOverlay(){
-  let container = document.getElementById('overlay-content');
-  container.innerHTML='';
-
-  // 1️⃣ Notes par matière
-  for(let matiere in notes){
-    let matDiv = document.createElement('div');
-    matDiv.className='matiere';
-    let title = document.createElement('h2');
-    title.textContent=matiere;
-    matDiv.appendChild(title);
-
-    notes[matiere].forEach(note=>{
-      let n = document.createElement('div');
-      n.className='note';
-      n.textContent=note;
-      matDiv.appendChild(n);
-    });
-
-    container.appendChild(matDiv);
-  }
-
-  // 2️⃣ Dictionnaire
-  let dictDiv = document.createElement('div');
-  dictDiv.className='matiere';
-  let dictTitle = document.createElement('h2');
-  dictTitle.textContent='Dictionnaire';
-  dictDiv.appendChild(dictTitle);
-
-  dict500.forEach(d=>{
-    let e = document.createElement('div');
-    e.className='dict-entry';
-    e.innerHTML = `<span class="dict-word">${d.word}</span>: ${d.definition}`;
-    dictDiv.appendChild(e);
+function downloadPDF(title, exercices){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+  doc.setFontSize(18);
+  doc.text(title, 10, 20);
+  doc.setFontSize(12);
+  exercices.forEach((ex, i)=>{
+    doc.text(`${i+1}. ${ex}`, 10, 30 + i*10);
   });
-
-  container.appendChild(dictDiv);
+  doc.save(title + '.pdf');
 }
 </script>
+
 </body>
 </html>
