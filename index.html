@@ -3,99 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Enregistreur Vocal + Grave</title>
+<title>Vocal Temps Réel + Deep Voice</title>
 <style>
   body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
   button { margin: 5px; padding: 10px 20px; font-size: 16px; }
-  audio { display: block; margin-top: 20px; width: 100%; }
+  label { display: block; margin-top: 15px; }
 </style>
 </head>
 <body>
-<h2>Enregistreur Vocal (max 10 min) & Modifier la voix</h2>
+<h2>Enregistrement Vocal en Temps Réel + Voix Grave</h2>
 
-<button id="startBtn">🎤 Démarrer l'enregistrement</button>
-<button id="stopBtn" disabled>⏹ Arrêter l'enregistrement</button>
-<br>
+<button id="startBtn">🎤 Démarrer</button>
+<button id="stopBtn" disabled>⏹ Arrêter</button>
+
 <label for="pitch">Modifier la voix (grave <-> aigu) :</label>
-<input type="range" id="pitch" min="0.5" max="2" step="0.01" value="1">
+<input type="range" id="pitch" min="0.5" max="1.5" step="0.01" value="1">
 <span id="pitchValue">1</span>
 
-<audio id="player" controls></audio>
-
 <script>
-let mediaRecorder;
-let audioChunks = [];
 let audioContext;
+let stream;
 let sourceNode;
 let pitchNode;
 
 const startBtn = document.getElementById('startBtn');
 const stopBtn = document.getElementById('stopBtn');
-const player = document.getElementById('player');
 const pitchSlider = document.getElementById('pitch');
 const pitchValue = document.getElementById('pitchValue');
 
 startBtn.onclick = async () => {
-    if (!navigator.mediaDevices) {
-        alert("Votre navigateur ne supporte pas l'enregistrement audio.");
-        return;
-    }
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
-    audioChunks = [];
+    sourceNode = audioContext.createMediaStreamSource(stream);
 
-    mediaRecorder.ondataavailable = e => {
-        audioChunks.push(e.data);
-    };
+    // On crée un BiquadFilter pour simuler un effet grave
+    pitchNode = audioContext.createBiquadFilter();
+    pitchNode.type = 'lowshelf';
+    pitchNode.frequency.value = 200; // fréquence de base pour le grave
+    pitchNode.gain.value = 0;
 
-    mediaRecorder.onstop = async () => {
-        const blob = new Blob(audioChunks, { type: 'audio/webm' });
-        const url = URL.createObjectURL(blob);
+    sourceNode.connect(pitchNode);
+    pitchNode.connect(audioContext.destination);
 
-        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        const arrayBuffer = await blob.arrayBuffer();
-        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-
-        if (sourceNode) sourceNode.disconnect();
-        if (pitchNode) pitchNode.disconnect();
-
-        sourceNode = audioContext.createBufferSource();
-        sourceNode.buffer = audioBuffer;
-
-        pitchNode = audioContext.createGain(); // on utilisera playbackRate pour changer la hauteur
-        sourceNode.connect(pitchNode);
-        pitchNode.connect(audioContext.destination);
-
-        sourceNode.playbackRate.value = pitchSlider.value;
-
-        player.src = url;
-    };
-
-    mediaRecorder.start();
     startBtn.disabled = true;
     stopBtn.disabled = false;
 
-    // Arrêt automatique au bout de 10 min
+    // Limite 10 min
     setTimeout(() => {
-        if (mediaRecorder.state === "recording") {
-            mediaRecorder.stop();
-            startBtn.disabled = false;
-            stopBtn.disabled = true;
-        }
-    }, 10 * 60 * 1000); // 10 minutes
+        if (!stopBtn.disabled) stopBtn.click();
+    }, 10 * 60 * 1000);
 };
 
 stopBtn.onclick = () => {
-    mediaRecorder.stop();
+    if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+    }
+    if (audioContext) {
+        audioContext.close();
+    }
     startBtn.disabled = false;
     stopBtn.disabled = true;
 };
 
+// Slider pour modifier le pitch en temps réel
 pitchSlider.oninput = () => {
     pitchValue.textContent = pitchSlider.value;
-    if (sourceNode) {
-        sourceNode.playbackRate.value = pitchSlider.value;
+    if (pitchNode) {
+        // plus la valeur est basse, plus la voix devient grave
+        pitchNode.gain.value = -40 * (1 - pitchSlider.value); 
     }
 };
 </script>
