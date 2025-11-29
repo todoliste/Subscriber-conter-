@@ -1,183 +1,41 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html>
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Voice Changer — Stop fiable</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 18px; background:#f7f7f7; color:#111; }
-  button { padding:12px 18px; margin:6px; font-size:16px; }
-  label { display:block; margin-top:12px; }
-  audio { display:block; margin-top:14px; width:100%; }
-  .info { margin-top:10px; font-size:14px; color:#444; }
-</style>
+  <meta charset="UTF-8">
+  <title>Télécharger mes vidéos YouTube</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    input, button { padding: 10px; font-size: 16px; width: 100%; margin-top: 10px; }
+  </style>
 </head>
 <body>
-  <h2>Voice Changer — Enregistrer / Stop fiable</h2>
+  <h2>Télécharger ma vidéo YouTube</h2>
 
-  <button id="startBtn">🎤 Démarrer</button>
-  <button id="stopBtn" disabled>⛔ Arrêter</button>
+  <input id="ytlink" type="text" placeholder="Colle ton lien YouTube ici">
 
-  <label for="depth">Profondeur (plus bas = plus grave)</label>
-  <input id="depth" type="range" min="-12" max="12" step="1" value="-6">
-  <span id="depthVal">-6</span> demi-tons
+  <button onclick="go()">Télécharger</button>
 
-  <div class="info">Après Arrêter : écoute et téléchargement disponibles</div>
-
-  <audio id="player" controls></audio>
-  <a id="download" href="#" download="voice_changed.wav">Télécharger le wav</a>
-
-<script>
-(function(){
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn  = document.getElementById('stopBtn');
-  const depth    = document.getElementById('depth');
-  const depthVal = document.getElementById('depthVal');
-  const player   = document.getElementById('player');
-  const download = document.getElementById('download');
-
-  let audioContext = null;
-  let micStream = null;
-  let mediaRecorder = null;
-  let chunks = [];
-  let sourceNode = null;
-  let filterNode = null;
-  let dest = null;
-
-  depth.oninput = () => depthVal.textContent = depth.value;
-
-  startBtn.addEventListener('click', async () => {
-    try {
-      // si déjà démarré, on ignore
-      if (mediaRecorder && mediaRecorder.state === 'recording') {
-        console.log('Already recording');
+  <script>
+    function go() {
+      const url = document.getElementById('ytlink').value.trim();
+      if (!url.includes("youtube.com/watch")) {
+        alert("Mets un vrai lien YouTube !");
         return;
       }
 
-      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      // Récupération de l’ID vidéo
+      const id = new URL(url).searchParams.get("v");
 
-      // source du micro
-      sourceNode = audioContext.createMediaStreamSource(micStream);
-
-      // filtre pour "rendre grave" (lowshelf)
-      filterNode = audioContext.createBiquadFilter();
-      filterNode.type = 'lowshelf';
-      filterNode.frequency.value = 200;
-      // on mappe le slider (-12..12) vers un gain raisonnable (-24..12 dB)
-      const sliderToGain = (v) => (v < 0 ? (v / 12) * -24 : (v / 12) * 12);
-      filterNode.gain.value = sliderToGain(parseInt(depth.value, 10));
-
-      // connect graph : microphone -> filter -> destination (écoute)
-      sourceNode.connect(filterNode);
-      filterNode.connect(audioContext.destination);
-
-      // destination pour l'enregistrement (on enregistre le signal après filtre)
-      dest = audioContext.createMediaStreamDestination();
-      filterNode.connect(dest);
-
-      // Création du MediaRecorder SUR le stream modifié (dest.stream)
-      mediaRecorder = new MediaRecorder(dest.stream);
-      chunks = [];
-
-      // Important : ondataavailable & onstop définis AVANT start()
-      mediaRecorder.ondataavailable = (e) => {
-        if (e.data && e.data.size > 0) chunks.push(e.data);
-      };
-
-      mediaRecorder.onstop = () => {
-        // crée le blob final et prépare player + download
-        const blob = new Blob(chunks, { type: 'audio/wav' });
-        const url = URL.createObjectURL(blob);
-        player.src = url;
-        download.href = url;
-
-        // cleanup : arrêter le micro et fermer audioContext proprement
-        try {
-          if (micStream) {
-            micStream.getTracks().forEach(t => t.stop());
-            micStream = null;
-          }
-        } catch (err) { console.warn('stop tracks err', err); }
-
-        try {
-          if (audioContext && audioContext.state !== 'closed') {
-            audioContext.close();
-          }
-        } catch (err) { console.warn('close ctx err', err); }
-
-        // réinitialise variables
-        audioContext = null;
-        mediaRecorder = null;
-        sourceNode = null;
-        filterNode = null;
-        dest = null;
-
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-      };
-
-      // Démarre l'enregistrement uniquement après avoir attaché handlers
-      mediaRecorder.start();
-
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-
-      // mise à jour du gain si on bouge le slider pendant l'enregistrement
-      depth.addEventListener('input', () => {
-        if (filterNode) filterNode.gain.value = sliderToGain(parseInt(depth.value, 10));
-      });
-
-    } catch (err) {
-      console.error('Erreur démarrage:', err);
-      alert('Impossible d’accéder au micro — vérifie les permissions.');
-    }
-  });
-
-  stopBtn.addEventListener('click', () => {
-    try {
-      if (!mediaRecorder) {
-        console.log('Aucun enregistrement en cours');
-        // mais on s'assure de nettoyer les tracks si elles existent
-        if (micStream) {
-          micStream.getTracks().forEach(t => t.stop());
-          micStream = null;
-        }
-        if (audioContext) {
-          try { audioContext.close(); } catch(e){/* ignore */ }
-          audioContext = null;
-        }
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
+      if (!id) {
+        alert("Lien invalide");
         return;
       }
 
-      // on n'appelle stop que si l'état est "recording"
-      if (mediaRecorder.state === 'recording') {
-        mediaRecorder.stop();
-        // NE PAS fermer le audioContext ici : on le fait dans onstop() pour attendre la finalisation du blob
-      } else {
-        console.log('Recorder state:', mediaRecorder.state);
-        // si déjà "inactive", on force cleanup
-        if (micStream) {
-          micStream.getTracks().forEach(t => t.stop());
-          micStream = null;
-        }
-        if (audioContext) {
-          try { audioContext.close(); } catch(e){/* ignore */ }
-          audioContext = null;
-        }
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-      }
-    } catch (err) {
-      console.error('Erreur stop:', err);
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-    }
-  });
+      // Lien officiel YouTube Studio (permet de télécharger les vidéos que TU as postées)
+      const studioUrl = "https://studio.youtube.com/video/" + id;
 
-})(); // IIFE
-</script>
+      window.location.href = studioUrl;
+    }
+  </script>
 </body>
 </html>
