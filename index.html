@@ -1,87 +1,183 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Voice Changer Fonctionnel</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Voice Changer — Stop fiable</title>
 <style>
-  body { font-family: Arial; padding: 20px; }
-  button { padding: 15px; font-size: 18px; margin: 5px; }
-  audio { margin-top: 20px; width: 100%; }
+  body { font-family: Arial, sans-serif; padding: 18px; background:#f7f7f7; color:#111; }
+  button { padding:12px 18px; margin:6px; font-size:16px; }
+  label { display:block; margin-top:12px; }
+  audio { display:block; margin-top:14px; width:100%; }
+  .info { margin-top:10px; font-size:14px; color:#444; }
 </style>
 </head>
 <body>
+  <h2>Voice Changer — Enregistrer / Stop fiable</h2>
 
-<h2>Voice changer – Enregistrer + Arrêter</h2>
+  <button id="startBtn">🎤 Démarrer</button>
+  <button id="stopBtn" disabled>⛔ Arrêter</button>
 
-<button id="startBtn">🎤 Démarrer</button>
-<button id="stopBtn" disabled>⛔ Arrêter</button>
+  <label for="depth">Profondeur (plus bas = plus grave)</label>
+  <input id="depth" type="range" min="-12" max="12" step="1" value="-6">
+  <span id="depthVal">-6</span> demi-tons
 
-<audio id="player" controls></audio>
-<a id="download" href="#" download="voice.wav">Télécharger</a>
+  <div class="info">Après Arrêter : écoute et téléchargement disponibles</div>
 
-<script src="https://cdn.jsdelivr.net/npm/soundbank-pitch-shift/dist/pitch-shift.min.js"></script>
+  <audio id="player" controls></audio>
+  <a id="download" href="#" download="voice_changed.wav">Télécharger le wav</a>
 
 <script>
-let audioContext;
-let mediaStream;
-let recorder;
-let chunks = [];
-let pitchNode;
+(function(){
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn  = document.getElementById('stopBtn');
+  const depth    = document.getElementById('depth');
+  const depthVal = document.getElementById('depthVal');
+  const player   = document.getElementById('player');
+  const download = document.getElementById('download');
 
-const startBtn = document.getElementById("startBtn");
-const stopBtn = document.getElementById("stopBtn");
-const player = document.getElementById("player");
-const download = document.getElementById("download");
+  let audioContext = null;
+  let micStream = null;
+  let mediaRecorder = null;
+  let chunks = [];
+  let sourceNode = null;
+  let filterNode = null;
+  let dest = null;
 
-startBtn.onclick = async () => {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    
-    audioContext = new AudioContext();
-    const source = audioContext.createMediaStreamSource(mediaStream);
+  depth.oninput = () => depthVal.textContent = depth.value;
 
-    pitchNode = soundbankPitchShift(audioContext);
-    pitchNode.transpose = -6; // voix grave
+  startBtn.addEventListener('click', async () => {
+    try {
+      // si déjà démarré, on ignore
+      if (mediaRecorder && mediaRecorder.state === 'recording') {
+        console.log('Already recording');
+        return;
+      }
 
-    // écoute live
-    source.connect(pitchNode);
-    pitchNode.connect(audioContext.destination);
+      micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-    // enregistrement
-    const dest = audioContext.createMediaStreamDestination();
-    pitchNode.connect(dest);
+      // source du micro
+      sourceNode = audioContext.createMediaStreamSource(micStream);
 
-    recorder = new MediaRecorder(dest.stream);
+      // filtre pour "rendre grave" (lowshelf)
+      filterNode = audioContext.createBiquadFilter();
+      filterNode.type = 'lowshelf';
+      filterNode.frequency.value = 200;
+      // on mappe le slider (-12..12) vers un gain raisonnable (-24..12 dB)
+      const sliderToGain = (v) => (v < 0 ? (v / 12) * -24 : (v / 12) * 12);
+      filterNode.gain.value = sliderToGain(parseInt(depth.value, 10));
 
-    chunks = [];
-    recorder.ondataavailable = e => chunks.push(e.data);
+      // connect graph : microphone -> filter -> destination (écoute)
+      sourceNode.connect(filterNode);
+      filterNode.connect(audioContext.destination);
 
-    recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: "audio/wav" });
+      // destination pour l'enregistrement (on enregistre le signal après filtre)
+      dest = audioContext.createMediaStreamDestination();
+      filterNode.connect(dest);
+
+      // Création du MediaRecorder SUR le stream modifié (dest.stream)
+      mediaRecorder = new MediaRecorder(dest.stream);
+      chunks = [];
+
+      // Important : ondataavailable & onstop définis AVANT start()
+      mediaRecorder.ondataavailable = (e) => {
+        if (e.data && e.data.size > 0) chunks.push(e.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        // crée le blob final et prépare player + download
+        const blob = new Blob(chunks, { type: 'audio/wav' });
         const url = URL.createObjectURL(blob);
         player.src = url;
         download.href = url;
-    };
 
-    recorder.start();
+        // cleanup : arrêter le micro et fermer audioContext proprement
+        try {
+          if (micStream) {
+            micStream.getTracks().forEach(t => t.stop());
+            micStream = null;
+          }
+        } catch (err) { console.warn('stop tracks err', err); }
 
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
-};
+        try {
+          if (audioContext && audioContext.state !== 'closed') {
+            audioContext.close();
+          }
+        } catch (err) { console.warn('close ctx err', err); }
 
-stopBtn.onclick = () => {
-    try {
-        recorder.stop();
-    } catch (e) {
-        console.log("Erreur stop:", e);
+        // réinitialise variables
+        audioContext = null;
+        mediaRecorder = null;
+        sourceNode = null;
+        filterNode = null;
+        dest = null;
+
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      };
+
+      // Démarre l'enregistrement uniquement après avoir attaché handlers
+      mediaRecorder.start();
+
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      // mise à jour du gain si on bouge le slider pendant l'enregistrement
+      depth.addEventListener('input', () => {
+        if (filterNode) filterNode.gain.value = sliderToGain(parseInt(depth.value, 10));
+      });
+
+    } catch (err) {
+      console.error('Erreur démarrage:', err);
+      alert('Impossible d’accéder au micro — vérifie les permissions.');
     }
+  });
 
-    mediaStream.getTracks().forEach(t => t.stop());
-    audioContext.close();
+  stopBtn.addEventListener('click', () => {
+    try {
+      if (!mediaRecorder) {
+        console.log('Aucun enregistrement en cours');
+        // mais on s'assure de nettoyer les tracks si elles existent
+        if (micStream) {
+          micStream.getTracks().forEach(t => t.stop());
+          micStream = null;
+        }
+        if (audioContext) {
+          try { audioContext.close(); } catch(e){/* ignore */ }
+          audioContext = null;
+        }
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+        return;
+      }
 
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
-};
+      // on n'appelle stop que si l'état est "recording"
+      if (mediaRecorder.state === 'recording') {
+        mediaRecorder.stop();
+        // NE PAS fermer le audioContext ici : on le fait dans onstop() pour attendre la finalisation du blob
+      } else {
+        console.log('Recorder state:', mediaRecorder.state);
+        // si déjà "inactive", on force cleanup
+        if (micStream) {
+          micStream.getTracks().forEach(t => t.stop());
+          micStream = null;
+        }
+        if (audioContext) {
+          try { audioContext.close(); } catch(e){/* ignore */ }
+          audioContext = null;
+        }
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+      }
+    } catch (err) {
+      console.error('Erreur stop:', err);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    }
+  });
+
+})(); // IIFE
 </script>
 </body>
 </html>
