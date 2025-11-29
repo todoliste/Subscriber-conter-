@@ -1,79 +1,101 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vocal Temps Réel + Deep Voice</title>
-<style>
-  body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
-  button { margin: 5px; padding: 10px 20px; font-size: 16px; }
-  label { display: block; margin-top: 15px; }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voice Changer + Download (pitch shift)</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+    button, input { margin: 5px; padding: 8px; font-size: 16px; }
+    audio { display: block; margin-top: 15px; width: 100%; }
+  </style>
 </head>
 <body>
-<h2>Enregistrement Vocal en Temps Réel + Voix Grave</h2>
+  <h2>Voice Changer + Télécharger (pitch shift)</h2>
+  <button id="startBtn">🎤 Démarrer l'enregistrement</button>
+  <button id="stopBtn" disabled>⏹ Arrêter</button>
+  <br>
 
-<button id="startBtn">🎤 Démarrer</button>
-<button id="stopBtn" disabled>⏹ Arrêter</button>
+  <label for="pitch">Pitch (hauteur) :</label>
+  <input type="range" id="pitch" min="-12" max="12" step="1" value="0"> <!-- demi‑tons -->
+  <span id="pitchValue">0</span> demi‑tons
 
-<label for="pitch">Modifier la voix (grave <-> aigu) :</label>
-<input type="range" id="pitch" min="0.5" max="1.5" step="0.01" value="1">
-<span id="pitchValue">1</span>
+  <p>Après enregistrement : écoute + télécharger</p>
+  <audio id="player" controls></audio>
+  <a id="downloadLink" href="#" download="voice_changed.wav">Télécharger le fichier modifié</a>
 
+<script src="https://cdn.jsdelivr.net/npm/soundbank-pitch-shift/dist/pitch-shift.min.js"></script>
 <script>
-let audioContext;
-let stream;
-let sourceNode;
-let pitchNode;
+(async () => {
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const pitchSlider = document.getElementById('pitch');
+  const pitchValue = document.getElementById('pitchValue');
+  const player = document.getElementById('player');
+  const downloadLink = document.getElementById('downloadLink');
 
-const startBtn = document.getElementById('startBtn');
-const stopBtn = document.getElementById('stopBtn');
-const pitchSlider = document.getElementById('pitch');
-const pitchValue = document.getElementById('pitchValue');
+  let audioContext, mediaStream, mediaRecorder, chunks = [];
 
-startBtn.onclick = async () => {
-    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  let pitchShiftNode;
+
+  startBtn.onclick = async () => {
+    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
 
-    sourceNode = audioContext.createMediaStreamSource(stream);
+    const source = audioContext.createMediaStreamSource(mediaStream);
+    pitchShiftNode = soundbankPitchShift(audioContext);
+    source.connect(pitchShiftNode);
+    pitchShiftNode.connect(audioContext.destination);
 
-    // On crée un BiquadFilter pour simuler un effet grave
-    pitchNode = audioContext.createBiquadFilter();
-    pitchNode.type = 'lowshelf';
-    pitchNode.frequency.value = 200; // fréquence de base pour le grave
-    pitchNode.gain.value = 0;
+    // Pour enregistrer l'audio modifié : on crée un dest pour MediaRecorder
+    const dest = audioContext.createMediaStreamDestination();
+    pitchShiftNode.connect(dest);
 
-    sourceNode.connect(pitchNode);
-    pitchNode.connect(audioContext.destination);
+    mediaRecorder = new MediaRecorder(dest.stream);
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.start();
 
     startBtn.disabled = true;
     stopBtn.disabled = false;
+    chunks = [];
 
-    // Limite 10 min
+    // Optionnel : arrêt automatique au bout de 10 min
     setTimeout(() => {
-        if (!stopBtn.disabled) stopBtn.click();
+      if (mediaRecorder.state === 'recording') stopBtn.click();
     }, 10 * 60 * 1000);
-};
+  };
 
-stopBtn.onclick = () => {
-    if (stream) {
-        stream.getTracks().forEach(track => track.stop());
-    }
-    if (audioContext) {
-        audioContext.close();
-    }
+  stopBtn.onclick = () => {
+    mediaRecorder.stop();
+    mediaStream.getTracks().forEach(t => t.stop());
+    audioContext.close();
     startBtn.disabled = false;
     stopBtn.disabled = true;
-};
+  };
 
-// Slider pour modifier le pitch en temps réel
-pitchSlider.oninput = () => {
+  pitchSlider.oninput = () => {
     pitchValue.textContent = pitchSlider.value;
-    if (pitchNode) {
-        // plus la valeur est basse, plus la voix devient grave
-        pitchNode.gain.value = -40 * (1 - pitchSlider.value); 
+    if (pitchShiftNode) {
+      pitchShiftNode.transpose = parseInt(pitchSlider.value, 10);
     }
-};
+  };
+
+  mediaRecorder && (mediaRecorder.onstop = () => {
+    const blob = new Blob(chunks, { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    player.src = url;
+    downloadLink.href = url;
+  });
+
+  // Important : réassigner onstop après création
+  const originalOnStop = () => {
+    const blob = new Blob(chunks, { type: 'audio/wav' });
+    const url = URL.createObjectURL(blob);
+    player.src = url;
+    downloadLink.href = url;
+  };
+  if (mediaRecorder) mediaRecorder.onstop = originalOnStop;
+})();
 </script>
 </body>
 </html>
