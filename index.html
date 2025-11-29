@@ -1,344 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Stretch Stickman</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Enregistreur Vocal + Grave</title>
 <style>
-body {
-  margin: 0;
-  overflow: hidden;
-  background: #87CEEB; /* ciel */
-  font-family: Arial, sans-serif;
-}
-
-#game {
-  width: 100vw;
-  height: 100vh;
-  position: relative;
-  overflow: hidden;
-}
-
-/* sol */
-.floor {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 200%;
-  height: 120px;
-  background: #3e2f20;
-}
-
-/* stickman */
-.stickman {
-  position: absolute;
-  bottom: 90px;
-  left: 60px;
-  width: 60px;
-  height: 120px;
-  pointer-events: none;
-}
-
-.head {
-  width: 40px;
-  height: 40px;
-  background: #000;
-  border-radius: 50%;
-  position: absolute;
-  top: 0;
-  left: 10px;
-}
-
-.body {
-  width: 8px;
-  height: 60px;
-  background: #000;
-  position: absolute;
-  top: 40px;
-  left: 26px;
-  border-radius: 3px;
-}
-
-/* bras extensible */
-.arm {
-  width: 20px;
-  height: 14px;
-  background: #000;
-  border-radius: 4px;
-  position: absolute;
-  top: 45px;
-  left: 26px;
-  transform-origin: left center;
-}
-
-/* obstacle */
-.obstacle {
-  position: absolute;
-  background: #333;
-  border-radius: 4px;
-}
-
-/* Pics */
-.spike {
-  width: 60px;
-  height: 40px;
-  background: transparent;
-  position: absolute;
-  overflow: hidden;
-}
-.spike::before {
-  content: "";
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(45deg, transparent 50%, #555 50%),
-              linear-gradient(-45deg, transparent 50%, #555 50%);
-  background-size: 30px 40px;
-  background-repeat: repeat-x;
-  position: absolute;
-}
-
-/* pièce */
-.coin {
-  width: 26px;
-  height: 26px;
-  border-radius: 50%;
-  background: radial-gradient(circle, #ffe066 0%, #ffbf00 80%);
-  border: 3px solid #d49b00;
-  position: absolute;
-  box-shadow: 0 0 6px #ffea4f;
-}
-
-/* bouton tir */
-.shoot {
-  position: absolute;
-  right: 30px;
-  bottom: 40px;
-  width: 100px;
-  height: 100px;
-  background: white;
-  border-radius: 50%;
-  border: 4px solid #000;
-  font-size: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  user-select: none;
-}
+  body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+  button { margin: 5px; padding: 10px 20px; font-size: 16px; }
+  audio { display: block; margin-top: 20px; width: 100%; }
 </style>
 </head>
 <body>
+<h2>Enregistreur Vocal (max 10 min) & Modifier la voix</h2>
 
-<div id="game">
-  <div class="floor"></div>
+<button id="startBtn">🎤 Démarrer l'enregistrement</button>
+<button id="stopBtn" disabled>⏹ Arrêter l'enregistrement</button>
+<br>
+<label for="pitch">Modifier la voix (grave <-> aigu) :</label>
+<input type="range" id="pitch" min="0.5" max="2" step="0.01" value="1">
+<span id="pitchValue">1</span>
 
-  <div class="stickman">
-    <div class="head"></div>
-    <div class="body"></div>
-    <div class="arm" id="arm"></div>
-  </div>
-
-  <div class="shoot" id="shootBtn">➡️</div>
-</div>
+<audio id="player" controls></audio>
 
 <script>
-/* SCRIPT ARRIVE APRÈS — PARTIE 2 */
+let mediaRecorder;
+let audioChunks = [];
+let audioContext;
+let sourceNode;
+let pitchNode;
+
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const player = document.getElementById('player');
+const pitchSlider = document.getElementById('pitch');
+const pitchValue = document.getElementById('pitchValue');
+
+startBtn.onclick = async () => {
+    if (!navigator.mediaDevices) {
+        alert("Votre navigateur ne supporte pas l'enregistrement audio.");
+        return;
+    }
+
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = e => {
+        audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+        const blob = new Blob(audioChunks, { type: 'audio/webm' });
+        const url = URL.createObjectURL(blob);
+
+        if (!audioContext) audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const arrayBuffer = await blob.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        if (sourceNode) sourceNode.disconnect();
+        if (pitchNode) pitchNode.disconnect();
+
+        sourceNode = audioContext.createBufferSource();
+        sourceNode.buffer = audioBuffer;
+
+        pitchNode = audioContext.createGain(); // on utilisera playbackRate pour changer la hauteur
+        sourceNode.connect(pitchNode);
+        pitchNode.connect(audioContext.destination);
+
+        sourceNode.playbackRate.value = pitchSlider.value;
+
+        player.src = url;
+    };
+
+    mediaRecorder.start();
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+
+    // Arrêt automatique au bout de 10 min
+    setTimeout(() => {
+        if (mediaRecorder.state === "recording") {
+            mediaRecorder.stop();
+            startBtn.disabled = false;
+            stopBtn.disabled = true;
+        }
+    }, 10 * 60 * 1000); // 10 minutes
+};
+
+stopBtn.onclick = () => {
+    mediaRecorder.stop();
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+};
+
+pitchSlider.oninput = () => {
+    pitchValue.textContent = pitchSlider.value;
+    if (sourceNode) {
+        sourceNode.playbackRate.value = pitchSlider.value;
+    }
+};
 </script>
-
 </body>
-</html>// ------------------------------
-// SCRIPT DU JEU STRETCH STICKMAN
-// ------------------------------
-
-const game = document.getElementById("game");
-const arm = document.getElementById("arm");
-
-let level = 1;
-let coins = 0;
-
-function box(el){ return el.getBoundingClientRect(); }
-
-function clearLevel(){
-    document.querySelectorAll(".obstacle,.coin,.spike,.door").forEach(e=>e.remove());
-    arm.style.width = "20px";
-    arm.style.transform = "rotate(0deg)";
-}
-
-function spawnLevel(n){
-    clearLevel();
-
-    // difficulté
-    let diff = n / 100;
-
-    // porte d’arrivée
-    let door = document.createElement("div");
-    door.className = "door";
-    door.style.width = "40px";
-    door.style.height = "80px";
-    door.style.background = "#654321";
-    door.style.position = "absolute";
-    door.style.bottom = "90px";
-    door.style.left = (500 + diff * 400) + "px";
-    door.style.border = "4px solid #3a2415";
-    door.style.borderRadius = "6px";
-    game.appendChild(door);
-
-    let knob = document.createElement("div");
-    knob.style.width = "16px";
-    knob.style.height = "16px";
-    knob.style.background = "gold";
-    knob.style.borderRadius = "50%";
-    knob.style.position = "absolute";
-    knob.style.right = "-8px";
-    knob.style.top = "30px";
-    door.appendChild(knob);
-
-    // pièces
-    for(let i=0;i<3;i++){
-        let c = document.createElement("div");
-        c.className="coin";
-        c.style.left = (200 + Math.random()*400) + "px";
-        c.style.bottom = (150 + Math.random()*200) + "px";
-        game.appendChild(c);
-    }
-
-    // obstacles
-    let obsCount = Math.floor(2 + diff * 6);
-    for(let i=0;i<obsCount;i++){
-        let o = document.createElement("div");
-        o.className="obstacle";
-        o.style.width = (40 + Math.random()*40) + "px";
-        o.style.height = (40 + Math.random()*40) + "px";
-        o.style.left = (200 + Math.random()*500)+"px";
-        o.style.bottom = (90 + Math.random()*200)+"px";
-        game.appendChild(o);
-    }
-
-    // pics
-    let spike = document.createElement("div");
-    spike.className="spike";
-    spike.style.left = (300 + diff*200) + "px";
-    spike.style.bottom = "90px";
-    game.appendChild(spike);
-}
-
-// ------------------------------
-// BRAS EXTENSIBLE
-// ------------------------------
-
-function extendArm(targetX, targetY){
-    const armBox = box(arm);
-    const originX = armBox.left;
-    const originY = armBox.top + armBox.height/2;
-
-    const dx = targetX - originX;
-    const dy = targetY - originY;
-    const angle = Math.atan2(dy,dx);
-    const dist = Math.sqrt(dx*dx + dy*dy);
-
-    arm.style.transform = `rotate(${angle}rad)`;
-
-    let current = 20;
-    const step = 8;
-
-    let extend = setInterval(()=>{
-        current += step;
-        arm.style.width = current + "px";
-
-        if(collisionWithObstacle()){
-            clearInterval(extend);
-            resetArm();
-        }
-
-        if(collisionWithCoin()){
-            // coin récupéré
-        }
-
-        if(collisionWithDoor()){
-            clearInterval(extend);
-            nextLevel();
-        }
-
-        if(current >= dist){
-            clearInterval(extend);
-        }
-    },16);
-}
-
-function resetArm(){
-    arm.style.transition = "0.1s";
-    arm.style.width = "20px";
-    setTimeout(()=>arm.style.transition="0s",100);
-}
-
-// ------------------------------
-// COLLISIONS
-// ------------------------------
-
-function collisionWithObstacle(){
-    let a = box(arm);
-    for(let o of document.querySelectorAll(".obstacle,.spike")){
-        let b = box(o);
-        if(a.right>b.left && a.left<b.right && a.bottom>b.top && a.top<b.bottom){
-            spawnLevel(level);
-            return true;
-        }
-    }
-    return false;
-}
-
-function collisionWithCoin(){
-    let a = box(arm);
-    for(let c of document.querySelectorAll(".coin")){
-        let b = box(c);
-        if(a.right>b.left && a.left<b.right && a.bottom>b.top && a.top<b.bottom){
-            c.remove();
-            coins += 5;
-            console.log("Coins:",coins);
-            return true;
-        }
-    }
-    return false;
-}
-
-function collisionWithDoor(){
-    let a = box(arm);
-    let d = document.querySelector(".door");
-    if(!d) return false;
-    let b = box(d);
-
-    return (
-        a.right>b.left &&
-        a.left<b.right &&
-        a.bottom>b.top &&
-        a.top<b.bottom
-    );
-}
-
-// ------------------------------
-// NIVEAUX
-// ------------------------------
-
-function nextLevel(){
-    level++;
-    if(level>100) level=100;
-    spawnLevel(level);
-    resetArm();
-}
-
-// ------------------------------
-// SHOOT BUTTON (mobile)
-// ------------------------------
-
-document.getElementById("shootBtn").addEventListener("click", e=>{
-    extendArm(
-        Math.random()*window.innerWidth,
-        Math.random()*window.innerHeight
-    );
-});
-
-// PC
-game.addEventListener("click", e=>{
-    extendArm(e.clientX, e.clientY);
-});
-
-// premier niveau
-spawnLevel(level);
+</html>
