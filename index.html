@@ -1,101 +1,100 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Voice Changer + Download (pitch shift)</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
-    button, input { margin: 5px; padding: 8px; font-size: 16px; }
-    audio { display: block; margin-top: 15px; width: 100%; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Voice Changer (Grave) + Download</title>
+<style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  button { padding: 10px; margin: 5px; font-size: 18px; }
+  audio { margin-top: 20px; width: 100%; }
+</style>
 </head>
 <body>
-  <h2>Voice Changer + Télécharger (pitch shift)</h2>
-  <button id="startBtn">🎤 Démarrer l'enregistrement</button>
-  <button id="stopBtn" disabled>⏹ Arrêter</button>
-  <br>
 
-  <label for="pitch">Pitch (hauteur) :</label>
-  <input type="range" id="pitch" min="-12" max="12" step="1" value="0"> <!-- demi‑tons -->
-  <span id="pitchValue">0</span> demi‑tons
+<h2>Voice Changer – Voix Grave + Télécharger</h2>
 
-  <p>Après enregistrement : écoute + télécharger</p>
-  <audio id="player" controls></audio>
-  <a id="downloadLink" href="#" download="voice_changed.wav">Télécharger le fichier modifié</a>
+<button id="startBtn">🎤 Démarrer</button>
+<button id="stopBtn" disabled>⛔ Arrêter</button>
+
+<br><br>
+
+<label>Profondeur de la voix :</label>
+<input type="range" id="pitch" min="-12" max="12" step="1" value="-5">
+<span id="pitchValue">-5</span> demi-tons
+
+<br><br>
+
+<audio id="player" controls></audio>
+<a id="download" href="#" download="voice_changed.wav">Télécharger</a>
 
 <script src="https://cdn.jsdelivr.net/npm/soundbank-pitch-shift/dist/pitch-shift.min.js"></script>
+
 <script>
-(async () => {
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const pitchSlider = document.getElementById('pitch');
-  const pitchValue = document.getElementById('pitchValue');
-  const player = document.getElementById('player');
-  const downloadLink = document.getElementById('downloadLink');
+let audioContext;
+let stream;
+let recorder;
+let chunks = [];
 
-  let audioContext, mediaStream, mediaRecorder, chunks = [];
+let pitchNode;
 
-  let pitchShiftNode;
+const startBtn = document.getElementById('startBtn');
+const stopBtn = document.getElementById('stopBtn');
+const player = document.getElementById('player');
+const download = document.getElementById('download');
+const pitchSlider = document.getElementById('pitch');
+const pitchValue = document.getElementById('pitchValue');
 
-  startBtn.onclick = async () => {
-    mediaStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+startBtn.onclick = async () => {
+    stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    const source = audioContext.createMediaStreamSource(mediaStream);
-    pitchShiftNode = soundbankPitchShift(audioContext);
-    source.connect(pitchShiftNode);
-    pitchShiftNode.connect(audioContext.destination);
+    audioContext = new AudioContext();
+    let source = audioContext.createMediaStreamSource(stream);
 
-    // Pour enregistrer l'audio modifié : on crée un dest pour MediaRecorder
-    const dest = audioContext.createMediaStreamDestination();
-    pitchShiftNode.connect(dest);
+    // Pitch shift
+    pitchNode = soundbankPitchShift(audioContext);
+    pitchNode.transpose = parseInt(pitchSlider.value);
 
-    mediaRecorder = new MediaRecorder(dest.stream);
-    mediaRecorder.ondataavailable = e => chunks.push(e.data);
-    mediaRecorder.start();
+    source.connect(pitchNode);
+
+    // Destination pour écouter
+    pitchNode.connect(audioContext.destination);
+
+    // Destination pour enregistrer
+    let dest = audioContext.createMediaStreamDestination();
+    pitchNode.connect(dest);
+
+    recorder = new MediaRecorder(dest.stream);
+    
+    chunks = [];
+    recorder.ondataavailable = e => chunks.push(e.data);
+    
+    recorder.onstop = () => {
+        let blob = new Blob(chunks, { type: "audio/wav" });
+        let url = URL.createObjectURL(blob);
+        player.src = url;
+        download.href = url;
+    };
+
+    recorder.start();
 
     startBtn.disabled = true;
     stopBtn.disabled = false;
-    chunks = [];
+};
 
-    // Optionnel : arrêt automatique au bout de 10 min
-    setTimeout(() => {
-      if (mediaRecorder.state === 'recording') stopBtn.click();
-    }, 10 * 60 * 1000);
-  };
-
-  stopBtn.onclick = () => {
-    mediaRecorder.stop();
-    mediaStream.getTracks().forEach(t => t.stop());
+stopBtn.onclick = () => {
+    recorder.stop();
+    stream.getTracks().forEach(t => t.stop());
     audioContext.close();
+
     startBtn.disabled = false;
     stopBtn.disabled = true;
-  };
+};
 
-  pitchSlider.oninput = () => {
+pitchSlider.oninput = () => {
     pitchValue.textContent = pitchSlider.value;
-    if (pitchShiftNode) {
-      pitchShiftNode.transpose = parseInt(pitchSlider.value, 10);
-    }
-  };
-
-  mediaRecorder && (mediaRecorder.onstop = () => {
-    const blob = new Blob(chunks, { type: 'audio/wav' });
-    const url = URL.createObjectURL(blob);
-    player.src = url;
-    downloadLink.href = url;
-  });
-
-  // Important : réassigner onstop après création
-  const originalOnStop = () => {
-    const blob = new Blob(chunks, { type: 'audio/wav' });
-    const url = URL.createObjectURL(blob);
-    player.src = url;
-    downloadLink.href = url;
-  };
-  if (mediaRecorder) mediaRecorder.onstop = originalOnStop;
-})();
+    if (pitchNode) pitchNode.transpose = parseInt(pitchSlider.value);
+};
 </script>
 </body>
 </html>
